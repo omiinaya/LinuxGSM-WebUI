@@ -127,41 +127,77 @@ export async function POST(request: NextRequest) {
     if ((action === "install" || action === "auto-install") && connection && body.game) {
       // Install a new game server
       const { game } = body;
-      const scriptPath = `/home/${connection.username}/${game.id}server`;
       
-      // For auto-install, we'd bypass prompts
-      // For now, use the standard install command
-      const client = new SSHClient(connection);
-      await client.connect();
-
-      try {
-        // Download the LinuxGSM script if it doesn't exist
-        const downloadScript = `
-          if [ ! -f ${scriptPath} ]; then
-            cd /home/${connection.username}
-            curl -L https://github.com/GameServerManagers/LinuxGSM/archive/refs/heads/master.zip -o lgsm.zip
-            unzip lgsm.zip
-            mv LinuxGSM-master/linuxgsm.sh ${game.id}server
-            chmod +x ${game.id}server
-          fi
-        `;
-        await client.execute(downloadScript);
-
-        // Run install or auto-install
-        const installCmd = action === "auto-install" 
-          ? `${scriptPath} auto-install`
-          : `${scriptPath} install`;
+      if (connection.type === "local") {
+        // Local installation directly on the host
+        const executor = new LocalExecutor({ workingDir: connection.workingDir || process.cwd() });
+        const scriptPath = `${connection.installDir || "/home"}/${game.id}server`;
         
-        // Execute install with streaming (not implemented yet)
-        await client.execute(installCmd);
+        try {
+          // Download the LinuxGSM script if it doesn't exist
+          const scriptExists = await executor.fileExists(scriptPath);
+          if (!scriptExists) {
+            // Download and setup
+            const homeDir = connection.installDir || "/home";
+            await executor.execute(`cd ${homeDir} && curl -L https://github.com/GameServerManagers/LinuxGSM/archive/refs/heads/master.zip -o lgsm.zip`);
+            await executor.execute(`cd ${homeDir} && unzip -o lgsm.zip`);
+            await executor.execute(`cd ${homeDir} && mv LinuxGSM-master/linuxgsm.sh ${game.id}server`);
+            await executor.execute(`chmod +x ${scriptPath}`);
+          }
 
-        return NextResponse.json({ 
-          success: true,
-          message: "Installation completed",
-          scriptPath
-        });
-      } finally {
-        await client.disconnect();
+          // Run install or auto-install
+          const installCmd = action === "auto-install"
+            ? `${scriptPath} auto-install`
+            : `${scriptPath} install`;
+
+          const result = await executor.execute(installCmd);
+          
+          return NextResponse.json({
+            success: result.success,
+            message: result.output,
+            scriptPath,
+          });
+        } catch (err: any) {
+          return NextResponse.json(
+            { error: err.message || "Installation failed" },
+            { status: 500 }
+          );
+        }
+      } else {
+        // Remote installation via SSH
+        const scriptPath = `/home/${connection.username}/${game.id}server`;
+        
+        const client = new SSHClient(connection);
+        await client.connect();
+
+        try {
+          // Download the LinuxGSM script if it doesn't exist
+          const downloadScript = `
+            if [ ! -f ${scriptPath} ]; then
+              cd /home/${connection.username}
+              curl -L https://github.com/GameServerManagers/LinuxGSM/archive/refs/heads/master.zip -o lgsm.zip
+              unzip lgsm.zip
+              mv LinuxGSM-master/linuxgsm.sh ${game.id}server
+              chmod +x ${game.id}server
+            fi
+          `;
+          await client.execute(downloadScript);
+
+          // Run install or auto-install
+          const installCmd = action === "auto-install" 
+            ? `${scriptPath} auto-install`
+            : `${scriptPath} install`;
+          
+          await client.execute(installCmd);
+
+          return NextResponse.json({ 
+            success: true,
+            message: "Installation completed",
+            scriptPath
+          });
+        } finally {
+          await client.disconnect();
+        }
       }
     }
 

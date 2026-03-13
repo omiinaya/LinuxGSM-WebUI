@@ -31,7 +31,8 @@ export interface Server {
   lgsmVersion: string;
   lastUpdate: string;
   createdAt: string;
-  sshConnection: SSHConnection;
+  sshConnection?: SSHConnection; // optional for local servers
+  local?: boolean; // flag for local management
 }
 
 export interface Player {
