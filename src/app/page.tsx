@@ -6,6 +6,7 @@ import { Sidebar, Header } from "@/components/layout";
 import { ServerCard } from "@/components/servers";
 import { SSHConnectionModal } from "@/components/modals/ssh-connection-modal";
 import { useServersStore, useUIStore } from "@/stores";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Plus, LayoutGrid, List, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,26 @@ export default function Home() {
   const router = useRouter();
   const { servers, selectedServerId, selectServer, addServer, updateServer } = useServersStore();
   const { viewMode, setViewMode, sidebarOpen } = useUIStore();
+  const { user, loading: authLoading } = useAuth();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, authLoading, router]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect in effect
+  }
 
   const handleStart = async (server: Server) => {
     try {
