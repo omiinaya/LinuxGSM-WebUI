@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Only admin can install games
   if (user.role !== "admin") {
     return NextResponse.json({ error: "Forbidden: admin only" }, { status: 403 });
   }
@@ -29,27 +28,42 @@ export async function POST(request: NextRequest) {
 
     const targetDir = installDir || "/home/games";
     const executor = new LocalExecutor({ workingDir: targetDir });
-
     const scriptPath = `${targetDir}/${gameId}server`;
 
-    try {
-      // Ensure target directory exists
-      await executor.execute(`mkdir -p ${targetDir}`);
-    } catch (err) {
-      // ignore if exists
-    }
+    // Step 1: Create target directory
+    await executor.execute(`mkdir -p ${targetDir}`);
 
-    // Check if script already exists
+    // Step 2: Download and extract LinuxGSM if script doesn't exist
     const exists = await executor.fileExists(scriptPath);
     if (!exists) {
-      // Download LinuxGSM and set up script
-      await executor.execute(`cd ${targetDir} && curl -L https://github.com/GameServerManagers/LinuxGSM/archive/refs/heads/master.zip -o lgsm.zip`);
-      await executor.execute(`cd ${targetDir} && unzip -o lgsm.zip`);
-      await executor.execute(`cd ${targetDir} && mv LinuxGSM-master/linuxgsm.sh ${gameId}server`);
+      const downloadRes = await executor.execute(`curl -L https://github.com/GameServerManagers/LinuxGSM/archive/refs/heads/master.zip -o lgsm.zip`);
+      if (!downloadRes.success) {
+        return NextResponse.json({ 
+          error: "Failed to download LinuxGSM", 
+          details: downloadRes.error || downloadRes.output 
+        }, { status: 500 });
+      }
+
+      const unzipRes = await executor.execute(`unzip -o lgsm.zip`);
+      if (!unzipRes.success) {
+        return NextResponse.json({ 
+          error: "Failed to unzip LinuxGSM", 
+          details: unzipRes.error || unzipRes.output 
+        }, { status: 500 });
+      }
+
+      const mvRes = await executor.execute(`mv LinuxGSM-master/linuxgsm.sh ${scriptPath}`);
+      if (!mvRes.success) {
+        return NextResponse.json({ 
+          error: "Failed to prepare script", 
+          details: mvRes.error || mvRes.output 
+        }, { status: 500 });
+      }
+
       await executor.execute(`chmod +x ${scriptPath}`);
     }
 
-    // Run auto-install
+    // Step 3: Run auto-install
     const result = await executor.execute(`${scriptPath} auto-install`);
 
     if (result.success) {
@@ -61,14 +75,18 @@ export async function POST(request: NextRequest) {
       });
     } else {
       return NextResponse.json(
-        { error: "Installation failed", details: result.error || result.output },
+        { 
+          error: "Installation failed", 
+          details: result.error || result.output,
+          command: `${scriptPath} auto-install`
+        },
         { status: 500 }
       );
     }
   } catch (err: any) {
     console.error("Local install error:", err);
     return NextResponse.json(
-      { error: err.message || "Installation failed" },
+      { error: err.message || "Installation failed", stack: err.stack },
       { status: 500 }
     );
   }
