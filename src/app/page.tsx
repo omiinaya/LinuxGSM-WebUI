@@ -17,6 +17,7 @@ export default function Home() {
   const { servers, selectedServerId, selectServer, addServer, updateServer } = useServersStore();
   const { viewMode, setViewMode, sidebarOpen } = useUIStore();
   const { user, loading: authLoading } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   // Server actions - must be defined before early returns
   const refreshServerStatus = useCallback(async (server: Server) => {
@@ -115,6 +116,26 @@ export default function Home() {
     );
   }, [servers, refreshServerStatus]);
 
+  const handleDiscoverLocal = useCallback(async () => {
+    try {
+      const res = await fetch("/api/local/discover", {
+        credentials: "include",
+      });
+      if (!res.ok) {
+        throw new Error("Discovery failed");
+      }
+      const data = await res.json();
+      // Add discovered servers to store
+      data.servers.forEach((server: any) => {
+        // Check if already exists by name/path? For now, just add
+        addServer(server);
+      });
+      alert(`Discovered ${data.servers.length} local server(s).`);
+    } catch (err: any) {
+      alert("Discovery error: " + err.message);
+    }
+  }, [addServer]);
+
   // Effects - must be called unconditionally
   useEffect(() => {
     if (servers.length > 0) {
@@ -191,6 +212,18 @@ export default function Home() {
                   Refresh All
                 </Button>
               </div>
+              {isAdmin && (
+                <div className="bg-card rounded-lg border p-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleDiscoverLocal}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Discover Local
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Server List Header */}
