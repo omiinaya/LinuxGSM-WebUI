@@ -16,8 +16,8 @@ export async function getService(
     const client = new SSHClient(connection);
     await client.connect();
     const service = new LinuxGSMService(client, server);
-    return { 
-      service, 
+    return {
+      service,
       cleanup: async () => {
         await client.disconnect().catch(console.error);
       }

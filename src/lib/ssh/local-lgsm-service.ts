@@ -188,4 +188,9 @@ export class LocalLinuxGSMService {
   async update(): Promise<CommandResult> {
     return await this.executor.execute(`${this.getScriptPath()} update`);
   }
+
+  // Generic command execution
+  async execute(command: string): Promise<CommandResult> {
+    return await this.executor.execute(command);
+  }
 }

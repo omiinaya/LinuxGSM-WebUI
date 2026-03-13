@@ -181,7 +181,7 @@ export default function MonitorPage() {
                   <Label htmlFor="username">SSH Username</Label>
                   <Input
                     id="username"
-                    placeholder={server.sshConnection?.username || ""}
+                    placeholder={server.local ? "Current user" : ((server.sshConnection as any)?.username || "")}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />

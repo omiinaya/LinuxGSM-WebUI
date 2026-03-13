@@ -31,7 +31,7 @@ export interface Server {
   lgsmVersion: string;
   lastUpdate: string;
   createdAt: string;
-  sshConnection?: SSHConnection; // optional for local servers
+  sshConnection?: SSHConnection | { type: "local"; workingDir?: string };
   local?: boolean; // flag for local management
 }
 

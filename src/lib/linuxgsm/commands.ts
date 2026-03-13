@@ -196,12 +196,17 @@ export class LinuxGSMService {
     }
   }
 
-  async saveConfig(configType: "lgsm" | "game", content: string, path: string): Promise<{ success: boolean }> {
-    try {
-      await this.client.writeFile(path, content);
-      return { success: true };
-    } catch {
-      return { success: false };
-    }
-  }
-}
+   async saveConfig(configType: "lgsm" | "game", content: string, path: string): Promise<{ success: boolean }> {
+     try {
+       await this.client.writeFile(path, content);
+       return { success: true };
+     } catch {
+       return { success: false };
+     }
+   }
+
+   // Generic command execution
+   async execute(command: string): Promise<{ success: boolean; output: string; error?: string }> {
+     return await this.client.execute(command);
+   }
+ }

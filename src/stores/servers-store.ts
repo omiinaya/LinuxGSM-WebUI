@@ -29,9 +29,12 @@ export const useServersStore = create<ServersState>()(
 
       setServers: (servers) => set({ servers }),
       
-      addServer: (server) => set((state) => ({ 
-        servers: [...state.servers, server] 
-      })),
+       addServer: (server) => set((state) => {
+         const processed = server.local
+           ? { ...server, sshConnection: { type: "local" as const, workingDir: server.installPath } }
+           : server;
+         return { servers: [...state.servers, processed] };
+       }),
       
       updateServer: (id, updates) => set((state) => ({
         servers: state.servers.map((s) => 
