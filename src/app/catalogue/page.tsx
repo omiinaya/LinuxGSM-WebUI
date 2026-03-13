@@ -23,7 +23,7 @@ export default function CataloguePage() {
   const { user, loading: authLoading } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
-  const [installDir, setInstallDir] = useState("/home/games");
+  const [installDir, setInstallDir] = useState("./games");
   const [installingId, setInstallingId] = useState<string | null>(null);
   const [installStatus, setInstallStatus] = useState<{ game: string; success: boolean; message: string } | null>(null);
 
