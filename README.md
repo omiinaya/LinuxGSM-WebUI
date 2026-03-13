@@ -38,11 +38,12 @@ A modern, responsive web interface for managing LinuxGSM game servers built with
    ```bash
    npm install
    ```
-3. Run the development server:
+3. Copy `.env.example` to `.env` and adjust as needed (defaults are fine for local)
+4. Run the development server:
    ```bash
    npm run dev
    ```
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://0.0.0.0:3331](http://0.0.0.0:3331) in your browser (or http://localhost:3331)
 
 ### Build for Production
 
@@ -50,6 +51,8 @@ A modern, responsive web interface for managing LinuxGSM game servers built with
 npm run build
 npm start
 ```
+
+The server binds to `0.0.0.0:3331` by default. You can change the port via the `PORT` environment variable or by editing the `start` script. The host is always `0.0.0.0` to allow external access.
 
 ## Usage
 
@@ -68,6 +71,19 @@ npm start
 
 ## Configuration
 
+### Environment Variables
+
+Copy `.env.example` to `.env` and customize:
+
+- `PORT` - Server port (default: 3331)
+- `HOST` - Bind address (default: 0.0.0.0)
+- `DEFAULT_ADMIN_PASSWORD` - Initial admin password (default: admin123)
+- `PEPPER` - Optional pepper for password hashing (recommended for production)
+- `NODE_ENV` - Set to `production` for production deployments
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` - Email settings for alerts
+
+The application stores data (users, sessions, audit logs) in the `data/` directory. Ensure this directory is writable.
+
 ### Alert Webhooks
 
 To receive Discord notifications:
@@ -77,25 +93,45 @@ To receive Discord notifications:
 4. Toggle events you want to be notified about
 5. Click "Test" to verify
 
+### Security Notes
+
+- On first startup, an admin user is automatically created: username `admin` with password from `DEFAULT_ADMIN_PASSWORD` (or `admin123`)
+- All credentials are stored encrypted (scrypt) in `data/users.json`
+- Sessions are stored in `data/sessions.json`
+- Audit logs are stored in `data/audit-log.json` and can be viewed by admins at `/admin/audit`
+- Two-factor authentication (2FA) is available per user in the Profile page
+- Role-based access control: admin (full), operator (server control), viewer (read-only)
+
 ## Project Structure
 
 ```
 /src
   /app
-    /api           - Next.js API routes for SSH operations
-    /server/[id]   - Server detail page
-    /alerts        - Alerts configuration page
-    page.tsx       - Dashboard (home)
-    layout.tsx     - Root layout with command palette
+    /api
+      ... various API routes
+      /auth          - Authentication (login, logout, 2FA)
+      /servers/[id]  - Server operations
+      /admin         - Admin pages (users, audit)
+    /admin
+      /users         - User management page
+      /audit         - Audit log viewer page
+    /profile        - User profile page
+    /sessions       - Session management page
+    /server/[id]    - Server detail pages (overview, console, config, monitor, parameters, backups, logs)
+    /alerts         - Alerts configuration page
+    page.tsx        - Dashboard (home)
+    layout.tsx      - Root layout
   /components
-    /layout        - Header, Sidebar
-    /modals        - SSH connection modal
-    /servers       - Server card
-    /ui            - shadcn/ui components
+    /layout         - Header, Sidebar
+    /modals         - SSH connection modal
+    /servers        - Server card
+    /ui             - shadcn/ui components
     command-palette.tsx
   /lib
-    /ssh           - SSH client wrapper
-    /linuxgsm      - LinuxGSM command helpers (detector, commands)
+    /auth           - Authentication helpers, user management
+    /audit.ts       - Audit logging system
+    /ssh            - SSH client wrapper
+    /linuxgsm       - LinuxGSM command helpers (detector, commands)
     utils.ts
   /stores          - Zustand stores (servers, ui, auth)
   /types           - TypeScript type definitions
