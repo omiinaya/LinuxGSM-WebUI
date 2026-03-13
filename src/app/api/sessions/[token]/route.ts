@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest, deleteSession } from "@/lib/auth";
+import { logAuthEvent } from "@/lib/audit";
 
 // DELETE /api/sessions/[token] - Revoke a session
 export async function DELETE(
@@ -26,5 +27,12 @@ export async function DELETE(
   }
 
   await deleteSession(token);
+  
+  // Log session revocation
+  await logAuthEvent("session_revoke", user.id, user.username, {
+    revokedUserId: session.userId,
+    isCurrent: session.token === request.cookies?.get("session_token")?.value,
+  });
+
   return NextResponse.json({ success: true });
 }

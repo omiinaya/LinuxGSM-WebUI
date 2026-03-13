@@ -15,10 +15,13 @@ export interface User {
   role: "admin" | "operator" | "viewer";
   createdAt: string;
   lastLogin?: string;
+  // 2FA fields
+  totpSecret?: string;
+  totpEnabled?: boolean;
 }
 
 // Public user type (no sensitive data)
-export type PublicUser = Pick<User, 'id' | 'username' | 'email' | 'role' | 'createdAt' | 'lastLogin'>;
+export type PublicUser = Pick<User, 'id' | 'username' | 'email' | 'role' | 'createdAt' | 'lastLogin' | 'totpEnabled'>;
 
 export interface Session {
   token: string;
@@ -235,6 +238,71 @@ export async function updateUserPassword(
   const { hash, salt } = hashPassword(newPassword);
   user.passwordHash = hash;
   user.salt = salt;
+  await writeJson(USERS_FILE, users);
+  return { success: true };
+}
+
+// 2FA functions
+export function generateTOTPSecret(): string {
+  return crypto.randomBytes(20).toString("hex");
+}
+
+export function getTOTPCode(secret: string, timeStep?: number): string {
+  if (!timeStep) timeStep = Math.floor(Date.now() / 1000 / 30);
+  const key = Buffer.from(secret, "hex");
+  const timeBuffer = new ArrayBuffer(8);
+  const timeView = new DataView(timeBuffer);
+  timeView.setUint32(0, timeStep, false);
+  timeView.setUint32(4, 0, false);
+  
+  const hmac = crypto.createHmac("sha1", key);
+  hmac.update(Buffer.from(timeBuffer));
+  const digest = hmac.digest();
+  
+  const offset = digest[digest.length - 1] & 0x0f;
+  const code = ((digest[offset] & 0x7f) << 24) |
+               ((digest[offset + 1] & 0xff) << 16) |
+               ((digest[offset + 2] & 0xff) << 8) |
+               (digest[offset + 3] & 0xff);
+  
+  return (code % 1000000).toString().padStart(6, "0");
+}
+
+export function verifyTOTP(secret: string, code: string): boolean {
+  // Allow code to be valid for current and previous time step (for clock skew)
+  const now = Math.floor(Date.now() / 1000 / 30);
+  const expected = getTOTPCode(secret, now);
+  const expectedPrev = getTOTPCode(secret, now - 1);
+  return code === expected || code === expectedPrev;
+}
+
+// Enable 2FA for user
+export async function enable2FA(userId: string, secret: string): Promise<boolean> {
+  const users = await getAllUsers();
+  const user = users.find(u => u.id === userId);
+  if (!user) return false;
+  user.totpSecret = secret;
+  user.totpEnabled = true;
+  await writeJson(USERS_FILE, users);
+  return true;
+}
+
+// Disable 2FA for user
+export async function disable2FA(userId: string, password: string): Promise<{ success: boolean; error?: string }> {
+  const users = await getAllUsers();
+  const user = users.find(u => u.id === userId);
+  if (!user) {
+    return { success: false, error: "User not found" };
+  }
+  if (!user.totpEnabled) {
+    return { success: false, error: "2FA not enabled" };
+  }
+  // If password is provided and matches, we can disable
+  if (!verifyPassword(password, user.passwordHash, user.salt)) {
+    return { success: false, error: "Invalid password" };
+  }
+  user.totpSecret = undefined;
+  user.totpEnabled = false;
   await writeJson(USERS_FILE, users);
   return { success: true };
 }

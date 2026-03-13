@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest, updateUserPassword } from "@/lib/auth";
+import { logAuthEvent } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request);
@@ -26,13 +27,16 @@ export async function POST(request: NextRequest) {
   }
 
   const result = await updateUserPassword(user.id, oldPassword, newPassword);
-  
+   
   if (!result.success) {
     return NextResponse.json(
       { error: result.error || "Failed to change password" },
       { status: 400 }
     );
   }
+
+  // Log password change
+  await logAuthEvent("password_change", user.id, user.username, { successful: true });
 
   return NextResponse.json({ success: true });
 }

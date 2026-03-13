@@ -14,7 +14,8 @@ import {
   Search,
   Menu,
   User,
-  Activity
+  Activity,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore, useServersStore } from "@/stores";
@@ -64,6 +65,7 @@ export function Sidebar({ className }: SidebarProps) {
   
   if (user?.role === "admin") {
     navigation.push({ name: "Sessions", icon: Activity, href: "/sessions", badge: 0 });
+    navigation.push({ name: "Audit Log", icon: FileText, href: "/admin/audit", badge: 0 });
     navigation.push({ name: "Admin", icon: Shield, href: "/admin/users", badge: 0 });
   }
 

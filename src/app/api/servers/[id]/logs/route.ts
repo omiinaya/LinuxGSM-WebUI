@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { SSHClient } from "@/lib/ssh/client";
 import { LinuxGSMService } from "@/lib/linuxgsm/commands";
 import { getUserFromRequest } from "@/lib/auth";
+// No audit needed for read-only logs
 
 // GET /api/servers/[id]/logs - Fetch log file content
 export async function GET(

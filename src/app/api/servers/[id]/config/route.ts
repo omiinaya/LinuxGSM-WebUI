@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { SSHClient } from "@/lib/ssh/client";
 import { LinuxGSMService } from "@/lib/linuxgsm/commands";
 import { getUserFromRequest } from "@/lib/auth";
+import { logServerEvent } from "@/lib/audit";
 
 // POST /api/servers/[id]/config - Get or save server config
 export async function POST(
@@ -69,6 +70,13 @@ export async function POST(
         }
 
         const result = await service.saveConfig("lgsm", config, configPath);
+        if (result.success) {
+          await logServerEvent("config_save", user.id, user.username, server.id, {
+            serverName: server.name,
+            configType: configType,
+            path: configPath,
+          });
+        }
         return NextResponse.json(result);
       }
 

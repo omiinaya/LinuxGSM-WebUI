@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest, createUser, getAllUsers } from "@/lib/auth";
+import { logAdminEvent } from "@/lib/audit";
 
 export async function GET(request: NextRequest) {
   const user = await getUserFromRequest(request);
@@ -42,6 +43,14 @@ export async function POST(request: NextRequest) {
   try {
     const newUser = await createUser(username, password, role, email);
     const { passwordHash, salt, ...safeUser } = newUser;
+    
+    // Log user creation
+    await logAdminEvent("user_create", user.id, user.username, newUser.id, {
+      createdUsername: newUser.username,
+      createdRole: role,
+      email: email || undefined,
+    });
+    
     return NextResponse.json(safeUser, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

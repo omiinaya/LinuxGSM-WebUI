@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest, deleteUser, updateUser } from "@/lib/auth";
+import { logAdminEvent } from "@/lib/audit";
 
 export async function DELETE(
   request: NextRequest,
@@ -29,6 +30,12 @@ export async function DELETE(
   if (!success) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+  
+  // Log user deletion
+  await logAdminEvent("user_delete", user.id, user.username, userId, {
+    deletedUserId: userId
+  });
+
   return NextResponse.json({ success: true });
 }
 
@@ -74,6 +81,12 @@ async function handleUpdate(
   if (!updated) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  // Log role/email change
+  await logAdminEvent("user_role_change", user.id, user.username, userId, {
+    role: role,
+    email: email,
+  });
 
   const { passwordHash, salt, ...safeUser } = updated;
   return NextResponse.json(safeUser);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { SSHClient } from "@/lib/ssh/client";
 import { LinuxGSMService } from "@/lib/linuxgsm/commands";
 import { getUserFromRequest } from "@/lib/auth";
+import { logServerEvent } from "@/lib/audit";
 
 // POST /api/servers/[id]/stop - Stop server
 export async function POST(
@@ -34,6 +35,9 @@ export async function POST(
     try {
       const service = new LinuxGSMService(client, server);
       const result = await service.stop();
+      if (result.success) {
+        await logServerEvent("stop", user.id, user.username, server.id, { serverName: server.name });
+      }
       return NextResponse.json(result);
     } finally {
       await client.disconnect();

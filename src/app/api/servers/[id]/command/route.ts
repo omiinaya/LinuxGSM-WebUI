@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { SSHClient } from "@/lib/ssh/client";
 import { LinuxGSMService } from "@/lib/linuxgsm/commands";
 import { getUserFromRequest } from "@/lib/auth";
+import { logServerEvent } from "@/lib/audit";
 
 // POST /api/servers/[id]/command - Send command to server console
 export async function POST(
@@ -34,6 +35,17 @@ export async function POST(
     try {
       const service = new LinuxGSMService(client, server);
       const result = await service.sendCommand(command);
+      
+      // Log important commands
+      const importantCommands = ["backup", "update", "check-update", "validate", "stop", "start", "restart"];
+      if (result.success && importantCommands.includes(command)) {
+        await logServerEvent(command as any, user.id, user.username, server.id, {
+          serverName: server.name,
+          command,
+          output: result.output,
+        });
+      }
+      
       return NextResponse.json(result);
     } finally {
       await client.disconnect();
