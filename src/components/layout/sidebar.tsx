@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useUIStore, useServersStore } from "@/stores";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +49,7 @@ export function Sidebar({ className }: SidebarProps) {
   );
 
   const { user } = useAuth();
+  const router = useRouter();
 
   const baseNavigation = [
     { name: "Servers", icon: Server, href: "/servers", badge: 0 },
@@ -157,6 +159,7 @@ export function Sidebar({ className }: SidebarProps) {
                     "w-full justify-start gap-2",
                     sidebarOpen ? "px-3" : "px-2"
                   )}
+                  onClick={() => router.push(item.href)}
                 >
                   <item.icon className="w-4 h-4" />
                   {sidebarOpen && <span>{item.name}</span>}

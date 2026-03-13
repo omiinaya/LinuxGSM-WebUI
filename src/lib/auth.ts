@@ -6,6 +6,15 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
 const SESSIONS_FILE = path.join(DATA_DIR, "sessions.json");
 
+// Ensure directory exists before file operations
+async function ensureDir(dir: string): Promise<void> {
+  try {
+    await fs.access(dir);
+  } catch {
+    await fs.mkdir(dir, { recursive: true });
+  }
+}
+
 export interface User {
   id: string;
   username: string;
