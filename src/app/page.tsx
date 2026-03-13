@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar, Header } from "@/components/layout";
 import { ServerCard } from "@/components/servers";
@@ -18,95 +18,7 @@ export default function Home() {
   const { viewMode, setViewMode, sidebarOpen } = useUIStore();
   const { user, loading: authLoading } = useAuth();
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
-    }
-  }, [user, authLoading, router]);
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null; // Will redirect in effect
-  }
-
-  const handleStart = async (server: Server) => {
-    try {
-      const response = await fetch(`/api/servers/${server.id}/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: server.sshConnection,
-          server,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Refresh server status after action
-        await refreshServerStatus(server);
-      } else {
-        console.error("Failed to start:", data.error);
-      }
-    } catch (error) {
-      console.error("Start error:", error);
-    }
-  };
-
-  const handleStop = async (server: Server) => {
-    try {
-      const response = await fetch(`/api/servers/${server.id}/stop`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: server.sshConnection,
-          server,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        await refreshServerStatus(server);
-      } else {
-        console.error("Failed to stop:", data.error);
-      }
-    } catch (error) {
-      console.error("Stop error:", error);
-    }
-  };
-
-  const handleRestart = async (server: Server) => {
-    try {
-      const response = await fetch(`/api/servers/${server.id}/restart`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: server.sshConnection,
-          server,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        await refreshServerStatus(server);
-      } else {
-        console.error("Failed to restart:", data.error);
-      }
-    } catch (error) {
-      console.error("Restart error:", error);
-    }
-  };
-
+  // Server actions - must be defined before early returns
   const refreshServerStatus = useCallback(async (server: Server) => {
     try {
       const response = await fetch(`/api/servers/${server.id}/status`, {
@@ -128,32 +40,117 @@ export default function Home() {
     }
   }, [updateServer]);
 
+  const handleStart = useCallback(async (server: Server) => {
+    try {
+      const response = await fetch(`/api/servers/${server.id}/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          connection: server.sshConnection,
+          server,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        await refreshServerStatus(server);
+      } else {
+        console.error("Failed to start:", data.error);
+      }
+    } catch (error) {
+      console.error("Start error:", error);
+    }
+  }, [refreshServerStatus]);
+
+  const handleStop = useCallback(async (server: Server) => {
+    try {
+      const response = await fetch(`/api/servers/${server.id}/stop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          connection: server.sshConnection,
+          server,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        await refreshServerStatus(server);
+      } else {
+        console.error("Failed to stop:", data.error);
+      }
+    } catch (error) {
+      console.error("Stop error:", error);
+    }
+  }, [refreshServerStatus]);
+
+  const handleRestart = useCallback(async (server: Server) => {
+    try {
+      const response = await fetch(`/api/servers/${server.id}/restart`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          connection: server.sshConnection,
+          server,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        await refreshServerStatus(server);
+      } else {
+        console.error("Failed to restart:", data.error);
+      }
+    } catch (error) {
+      console.error("Restart error:", error);
+    }
+  }, [refreshServerStatus]);
+
   const handleRefreshAll = useCallback(async () => {
-    // Refresh status for all servers
     await Promise.all(
       servers.map(server => refreshServerStatus(server))
     );
   }, [servers, refreshServerStatus]);
 
-  // Initial refresh when servers are loaded
+  // Effects - must be called unconditionally
   useEffect(() => {
     if (servers.length > 0) {
       handleRefreshAll().catch(console.error);
     }
-  }, [servers.length, handleRefreshAll]);
+  }, [handleRefreshAll, servers.length]);
 
-  // Auto-refresh every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       if (servers.length > 0) {
         handleRefreshAll().catch(console.error);
       }
     }, 30000);
-
     return () => clearInterval(interval);
-  }, [servers.length, handleRefreshAll]);
+  }, [handleRefreshAll, servers.length]);
 
-   const runningCount = servers.filter(s => s.status === "running").length;
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, authLoading, router]);
+
+  // Conditional rendering
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const runningCount = servers.filter(s => s.status === "running").length;
   const stoppedCount = servers.filter(s => s.status === "stopped").length;
 
   return (
