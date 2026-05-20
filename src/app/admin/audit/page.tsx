@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { Sidebar, Header } from "@/components/layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ArrowLeft, Filter } from "lucide-react";
 
 interface AuditEntry {
@@ -102,8 +108,12 @@ export default function AuditPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">Only administrators can view audit logs.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Access Denied
+          </h1>
+          <p className="text-gray-600 mb-4">
+            Only administrators can view audit logs.
+          </p>
           <Button onClick={() => router.push("/")}>Go to Dashboard</Button>
         </div>
       </div>
@@ -179,15 +189,21 @@ export default function AuditPage() {
                               {log.username || log.userId || "system"}
                             </td>
                             <td className="p-2">
-                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getActionColor(log.action)}`}>
+                              <span
+                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getActionColor(log.action)}`}
+                              >
                                 {log.action}
                               </span>
                             </td>
                             <td className="p-2 text-sm">
-                              {log.resource || (log.resourceId ? `ID: ${log.resourceId}` : "-")}
+                              {log.resource ||
+                                (log.resourceId
+                                  ? `ID: ${log.resourceId}`
+                                  : "-")}
                             </td>
                             <td className="p-2 text-sm">
-                              {log.details && Object.keys(log.details).length > 0 ? (
+                              {log.details &&
+                              Object.keys(log.details).length > 0 ? (
                                 <pre className="text-xs bg-muted p-2 rounded overflow-auto max-w-xs">
                                   {JSON.stringify(log.details, null, 2)}
                                 </pre>

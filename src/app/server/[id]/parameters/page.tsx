@@ -8,7 +8,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ArrowLeft, Save } from "lucide-react";
 
 interface ParamEntry {
@@ -58,7 +65,7 @@ export default function ParametersPage() {
       const configText = data.config || "";
 
       // Parse key="value" lines
-      const lines = configText.split('\n');
+      const lines = configText.split("\n");
       const entries: ParamEntry[] = [];
 
       const regex = /^(\w+)\s*=\s*"([^"]*)"/;
@@ -113,7 +120,9 @@ export default function ParametersPage() {
 
   // Helper functions
   const handleValueChange = (key: string, newValue: string) => {
-    setParamsList(prev => prev.map(p => p.key === key ? { ...p, value: newValue } : p));
+    setParamsList((prev) =>
+      prev.map((p) => (p.key === key ? { ...p, value: newValue } : p)),
+    );
   };
 
   const handleSave = async () => {
@@ -137,14 +146,14 @@ export default function ParametersPage() {
       }
 
       const data = await response.json();
-      const lines = (data.config || "").split('\n');
+      const lines = (data.config || "").split("\n");
 
       // Update lines with new values
-      paramsList.forEach(param => {
+      paramsList.forEach((param) => {
         lines[param.lineIndex] = `${param.key}="${param.value}"`;
       });
 
-      const newConfig = lines.join('\n');
+      const newConfig = lines.join("\n");
 
       // Save
       const saveResponse = await fetch(`/api/servers/${server.id}/config`, {
@@ -183,7 +192,8 @@ export default function ParametersPage() {
             <div className="text-center">
               <h1 className="text-2xl font-bold mb-2">Server Not Found</h1>
               <p className="text-muted-foreground mb-4">
-                The server you are looking for does not exist or has been removed.
+                The server you are looking for does not exist or has been
+                removed.
               </p>
               <Button onClick={() => router.push("/")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -220,7 +230,8 @@ export default function ParametersPage() {
               <CardHeader>
                 <CardTitle>LGSM Parameters</CardTitle>
                 <CardDescription>
-                  Edit start parameters for this server. Changes are saved directly to the LGSM config.
+                  Edit start parameters for this server. Changes are saved
+                  directly to the LGSM config.
                 </CardDescription>
               </CardHeader>
 
@@ -243,13 +254,15 @@ export default function ParametersPage() {
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {paramsList.map(param => (
+                        {paramsList.map((param) => (
                           <div key={param.key} className="space-y-2">
                             <Label htmlFor={param.key}>{param.key}</Label>
                             <Input
                               id={param.key}
                               value={param.value}
-                              onChange={(e) => handleValueChange(param.key, e.target.value)}
+                              onChange={(e) =>
+                                handleValueChange(param.key, e.target.value)
+                              }
                               placeholder={`Enter ${param.key}`}
                             />
                           </div>
@@ -262,7 +275,9 @@ export default function ParametersPage() {
 
               <CardFooter className="flex justify-between">
                 {saved && (
-                  <span className="text-sm text-green-500">Saved successfully</span>
+                  <span className="text-sm text-green-500">
+                    Saved successfully
+                  </span>
                 )}
                 <Button onClick={handleSave} disabled={saving || loading}>
                   <Save className="w-4 h-4 mr-2" />

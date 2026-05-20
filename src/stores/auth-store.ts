@@ -15,21 +15,23 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isLoading: false,
 
-      login: (user) => set({ 
-        user, 
-        isAuthenticated: true, 
-        isLoading: false 
-      }),
-      
-      logout: () => set({ 
-        user: null, 
-        isAuthenticated: false 
-      }),
-      
+      login: (user) =>
+        set({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        }),
+
+      logout: () =>
+        set({
+          user: null,
+          isAuthenticated: false,
+        }),
+
       setLoading: (isLoading) => set({ isLoading }),
     }),
     {
       name: "linuxgsm-auth",
-    }
-  )
+    },
+  ),
 );

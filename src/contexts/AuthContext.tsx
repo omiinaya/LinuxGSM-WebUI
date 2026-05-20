@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@/lib/auth";
 
@@ -42,11 +48,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Initialize auth system (create default admin if needed)
-    fetch("/api/auth/init", { method: "POST", credentials: "include" }).catch(console.error);
+    fetch("/api/auth/init", { method: "POST", credentials: "include" }).catch(
+      console.error,
+    );
     refresh();
   }, [refresh]);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (
+    username: string,
+    password: string,
+  ): Promise<boolean> => {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -83,21 +94,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const hasRole = useCallback((role: User["role"]): boolean => {
-    if (!user) return false;
-    const roleHierarchy = { admin: 3, operator: 2, viewer: 1 };
-    return (roleHierarchy[user.role] || 0) >= (roleHierarchy[role] || 0);
-  }, [user]);
+  const hasRole = useCallback(
+    (role: User["role"]): boolean => {
+      if (!user) return false;
+      const roleHierarchy = { admin: 3, operator: 2, viewer: 1 };
+      return (roleHierarchy[user.role] || 0) >= (roleHierarchy[role] || 0);
+    },
+    [user],
+  );
 
-  const canManageServer = useCallback((serverUserId?: string): boolean => {
-    if (!user) return false;
-    if (user.role === "admin") return true;
-    if (serverUserId && user.role === "operator") return true;
-    return false;
-  }, [user]);
+  const canManageServer = useCallback(
+    (serverUserId?: string): boolean => {
+      if (!user) return false;
+      if (user.role === "admin") return true;
+      if (serverUserId && user.role === "operator") return true;
+      return false;
+    },
+    [user],
+  );
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, logout, refresh, hasRole, canManageServer }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        login,
+        logout,
+        refresh,
+        hasRole,
+        canManageServer,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

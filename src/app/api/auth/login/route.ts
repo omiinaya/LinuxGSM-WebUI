@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { verifyUser, createSession, getSessionByToken, deleteSession } from "@/lib/auth";
+import {
+  verifyUser,
+  createSession,
+  getSessionByToken,
+  deleteSession,
+} from "@/lib/auth";
 import { logAuthEvent } from "@/lib/audit";
 
 // In-memory pending 2FA tokens (userId -> expires)
@@ -12,24 +17,37 @@ export async function POST(request: NextRequest) {
     const { username, password } = await request.json();
 
     // Get client IP
-    const ip = request.headers.get("x-forwarded-for") || 
-               request.headers.get("x-real-ip") || 
-               "unknown";
+    const ip =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
 
     if (!username || !password) {
-      await logAuthEvent("login_failed", undefined, username, { reason: "missing_credentials" }, ip);
+      await logAuthEvent(
+        "login_failed",
+        undefined,
+        username,
+        { reason: "missing_credentials" },
+        ip,
+      );
       return NextResponse.json(
         { error: "Username and password required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const user = await verifyUser(username, password);
     if (!user) {
-      await logAuthEvent("login_failed", undefined, username, { reason: "invalid_credentials" }, ip);
+      await logAuthEvent(
+        "login_failed",
+        undefined,
+        username,
+        { reason: "invalid_credentials" },
+        ip,
+      );
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -41,7 +59,13 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         expires: Date.now() + 5 * 60 * 1000, // 5 minutes
       });
-      await logAuthEvent("login_2fa_required", user.id, user.username, { ip }, ip);
+      await logAuthEvent(
+        "login_2fa_required",
+        user.id,
+        user.username,
+        { ip },
+        ip,
+      );
       return NextResponse.json({
         requires2FA: true,
         pendingToken,
@@ -51,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     // Create session
     const session = await createSession(user.id);
-    
+
     // Log successful login
     await logAuthEvent("login", user.id, user.username, { ip }, ip);
 
@@ -78,9 +102,6 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Login error:", error);
-    return NextResponse.json(
-      { error: "Login failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }

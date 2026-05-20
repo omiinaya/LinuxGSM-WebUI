@@ -6,10 +6,12 @@ import type { Server } from "@/types";
 
 export async function getService(
   connection: any,
-  server: Server
+  server: Server,
 ): Promise<{ service: any; cleanup: () => Promise<void> }> {
   if (connection?.type === "local") {
-    const executor = new LocalExecutor({ workingDir: connection.workingDir || process.cwd() });
+    const executor = new LocalExecutor({
+      workingDir: connection.workingDir || process.cwd(),
+    });
     const service = new LocalLinuxGSMService(executor, server);
     return { service, cleanup: async () => {} };
   } else {
@@ -20,7 +22,7 @@ export async function getService(
       service,
       cleanup: async () => {
         await client.disconnect().catch(console.error);
-      }
+      },
     };
   }
 }

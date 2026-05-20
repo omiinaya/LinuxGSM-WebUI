@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (!pendingToken || !code) {
       return NextResponse.json(
         { error: "Pending token and verification code required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     if (!pending) {
       return NextResponse.json(
         { error: "Invalid or expired pending token" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -47,16 +47,18 @@ export async function POST(request: NextRequest) {
     if (!user || !user.totpSecret) {
       return NextResponse.json(
         { error: "User not found or 2FA not enabled" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Verify TOTP code
     if (!verifyTOTP(user.totpSecret, code)) {
-      await logAuthEvent("login_2fa_failed", user.id, user.username, { reason: "invalid_code" });
+      await logAuthEvent("login_2fa_failed", user.id, user.username, {
+        reason: "invalid_code",
+      });
       return NextResponse.json(
         { error: "Invalid verification code" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -86,9 +88,6 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("2FA verify error:", error);
-    return NextResponse.json(
-      { error: "Verification failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
 }

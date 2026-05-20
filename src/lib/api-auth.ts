@@ -11,7 +11,10 @@ export async function requireAuth(request: NextRequest) {
 
 export function requireRole(user: any, allowedRoles: string[]) {
   if (!allowedRoles.includes(user.role)) {
-    return { error: "Forbidden: insufficient permissions", status: 403 } as const;
+    return {
+      error: "Forbidden: insufficient permissions",
+      status: 403,
+    } as const;
   }
   return null;
 }

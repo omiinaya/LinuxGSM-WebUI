@@ -14,106 +14,117 @@ import type { Server } from "@/types";
 
 export default function Home() {
   const router = useRouter();
-  const { servers, selectedServerId, selectServer, addServer, updateServer } = useServersStore();
+  const { servers, selectedServerId, selectServer, addServer, updateServer } =
+    useServersStore();
   const { viewMode, setViewMode, sidebarOpen } = useUIStore();
   const { user, loading: authLoading } = useAuth();
   const isAdmin = user?.role === "admin";
 
   // Server actions - must be defined before early returns
-  const refreshServerStatus = useCallback(async (server: Server) => {
-    try {
-      const response = await fetch(`/api/servers/${server.id}/status`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: server.sshConnection,
-        }),
-      });
+  const refreshServerStatus = useCallback(
+    async (server: Server) => {
+      try {
+        const response = await fetch(`/api/servers/${server.id}/status`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            connection: server.sshConnection,
+          }),
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status) {
-          updateServer(server.id, { status: data.status });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status) {
+            updateServer(server.id, { status: data.status });
+          }
         }
+      } catch (error) {
+        console.error("Status refresh error:", error);
       }
-    } catch (error) {
-      console.error("Status refresh error:", error);
-    }
-  }, [updateServer]);
+    },
+    [updateServer],
+  );
 
-  const handleStart = useCallback(async (server: Server) => {
-    try {
-      const response = await fetch(`/api/servers/${server.id}/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: server.sshConnection,
-          server,
-        }),
-      });
+  const handleStart = useCallback(
+    async (server: Server) => {
+      try {
+        const response = await fetch(`/api/servers/${server.id}/start`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            connection: server.sshConnection,
+            server,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        await refreshServerStatus(server);
-      } else {
-        console.error("Failed to start:", data.error);
+        if (response.ok) {
+          await refreshServerStatus(server);
+        } else {
+          console.error("Failed to start:", data.error);
+        }
+      } catch (error) {
+        console.error("Start error:", error);
       }
-    } catch (error) {
-      console.error("Start error:", error);
-    }
-  }, [refreshServerStatus]);
+    },
+    [refreshServerStatus],
+  );
 
-  const handleStop = useCallback(async (server: Server) => {
-    try {
-      const response = await fetch(`/api/servers/${server.id}/stop`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: server.sshConnection,
-          server,
-        }),
-      });
+  const handleStop = useCallback(
+    async (server: Server) => {
+      try {
+        const response = await fetch(`/api/servers/${server.id}/stop`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            connection: server.sshConnection,
+            server,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        await refreshServerStatus(server);
-      } else {
-        console.error("Failed to stop:", data.error);
+        if (response.ok) {
+          await refreshServerStatus(server);
+        } else {
+          console.error("Failed to stop:", data.error);
+        }
+      } catch (error) {
+        console.error("Stop error:", error);
       }
-    } catch (error) {
-      console.error("Stop error:", error);
-    }
-  }, [refreshServerStatus]);
+    },
+    [refreshServerStatus],
+  );
 
-  const handleRestart = useCallback(async (server: Server) => {
-    try {
-      const response = await fetch(`/api/servers/${server.id}/restart`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: server.sshConnection,
-          server,
-        }),
-      });
+  const handleRestart = useCallback(
+    async (server: Server) => {
+      try {
+        const response = await fetch(`/api/servers/${server.id}/restart`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            connection: server.sshConnection,
+            server,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        await refreshServerStatus(server);
-      } else {
-        console.error("Failed to restart:", data.error);
+        if (response.ok) {
+          await refreshServerStatus(server);
+        } else {
+          console.error("Failed to restart:", data.error);
+        }
+      } catch (error) {
+        console.error("Restart error:", error);
       }
-    } catch (error) {
-      console.error("Restart error:", error);
-    }
-  }, [refreshServerStatus]);
+    },
+    [refreshServerStatus],
+  );
 
   const handleRefreshAll = useCallback(async () => {
-    await Promise.all(
-      servers.map(server => refreshServerStatus(server))
-    );
+    await Promise.all(servers.map((server) => refreshServerStatus(server)));
   }, [servers, refreshServerStatus]);
 
   const handleDiscoverLocal = useCallback(async () => {
@@ -171,35 +182,43 @@ export default function Home() {
     return null;
   }
 
-  const runningCount = servers.filter(s => s.status === "running").length;
-  const stoppedCount = servers.filter(s => s.status === "stopped").length;
+  const runningCount = servers.filter((s) => s.status === "running").length;
+  const stoppedCount = servers.filter((s) => s.status === "stopped").length;
 
   return (
     <>
-      <SSHConnectionModal 
+      <SSHConnectionModal
         open={useUIStore.getState().showConnectionModal}
-        onOpenChange={(open) => useUIStore.getState().setShowConnectionModal(open)}
+        onOpenChange={(open) =>
+          useUIStore.getState().setShowConnectionModal(open)
+        }
       />
-      
+
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header />
-          
+
           <main className="flex-1 overflow-y-auto p-6">
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-card rounded-lg border p-4">
                 <div className="text-2xl font-bold">{servers.length}</div>
-                <div className="text-sm text-muted-foreground">Total Servers</div>
+                <div className="text-sm text-muted-foreground">
+                  Total Servers
+                </div>
               </div>
               <div className="bg-card rounded-lg border p-4">
-                <div className="text-2xl font-bold text-green-500">{runningCount}</div>
+                <div className="text-2xl font-bold text-green-500">
+                  {runningCount}
+                </div>
                 <div className="text-sm text-muted-foreground">Running</div>
               </div>
               <div className="bg-card rounded-lg border p-4">
-                <div className="text-2xl font-bold text-red-500">{stoppedCount}</div>
+                <div className="text-2xl font-bold text-red-500">
+                  {stoppedCount}
+                </div>
                 <div className="text-sm text-muted-foreground">Stopped</div>
               </div>
               <div className="bg-card rounded-lg border p-4">
@@ -228,9 +247,7 @@ export default function Home() {
 
             {/* Server List Header */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
-                Game Servers
-              </h2>
+              <h2 className="text-xl font-semibold">Game Servers</h2>
               <div className="flex items-center gap-2">
                 <div className="flex border rounded-md">
                   <Button
@@ -248,7 +265,11 @@ export default function Home() {
                     <List className="w-4 h-4" />
                   </Button>
                 </div>
-                <Button onClick={() => useUIStore.getState().setShowConnectionModal(true)}>
+                <Button
+                  onClick={() =>
+                    useUIStore.getState().setShowConnectionModal(true)
+                  }
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Server
                 </Button>
@@ -257,10 +278,14 @@ export default function Home() {
 
             {/* Server Grid */}
             {servers.length > 0 ? (
-              <div className={cn(
-                "grid gap-4",
-                viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"
-              )}>
+              <div
+                className={cn(
+                  "grid gap-4",
+                  viewMode === "grid"
+                    ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                    : "grid-cols-1",
+                )}
+              >
                 {servers.map((server) => (
                   <ServerCard
                     key={server.id}
@@ -280,7 +305,11 @@ export default function Home() {
                 <div className="text-muted-foreground mb-4">
                   No servers configured yet
                 </div>
-                <Button onClick={() => useUIStore.getState().setShowConnectionModal(true)}>
+                <Button
+                  onClick={() =>
+                    useUIStore.getState().setShowConnectionModal(true)
+                  }
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Your First Server
                 </Button>

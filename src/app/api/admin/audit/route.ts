@@ -16,16 +16,22 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get("action") || undefined;
   const username = searchParams.get("username") || undefined;
-  const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : undefined;
+  const limit = searchParams.get("limit")
+    ? parseInt(searchParams.get("limit")!)
+    : undefined;
 
   let logs = await getAuditLogs(limit);
 
   // Apply filters
   if (action) {
-    logs = logs.filter(log => log.action === action);
+    logs = logs.filter((log) => log.action === action);
   }
   if (username) {
-    logs = logs.filter(log => log.username && log.username.toLowerCase().includes(username.toLowerCase()));
+    logs = logs.filter(
+      (log) =>
+        log.username &&
+        log.username.toLowerCase().includes(username.toLowerCase()),
+    );
   }
 
   return NextResponse.json({ logs, total: logs.length });

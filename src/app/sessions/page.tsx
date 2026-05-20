@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { Sidebar, Header } from "@/components/layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ArrowLeft, Trash2 } from "lucide-react";
 
 interface Session {
@@ -57,7 +63,7 @@ export default function SessionsPage() {
       }
 
       // Remove from list
-      setSessions(sessions.filter(s => s.token !== token));
+      setSessions(sessions.filter((s) => s.token !== token));
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     }
@@ -87,8 +93,12 @@ export default function SessionsPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">Only administrators can view sessions.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Access Denied
+          </h1>
+          <p className="text-gray-600 mb-4">
+            Only administrators can view sessions.
+          </p>
           <Button onClick={() => router.push("/")}>Go to Dashboard</Button>
         </div>
       </div>
@@ -146,7 +156,9 @@ export default function SessionsPage() {
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium">{session.username}</span>
+                            <span className="font-medium">
+                              {session.username}
+                            </span>
                             <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">
                               {session.userRole}
                             </span>
@@ -157,7 +169,8 @@ export default function SessionsPage() {
                             )}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            Expires: {new Date(session.expiresAt).toLocaleString()}
+                            Expires:{" "}
+                            {new Date(session.expiresAt).toLocaleString()}
                           </div>
                           <div className="text-xs text-muted-foreground font-mono">
                             Token: {session.token.slice(0, 8)}...

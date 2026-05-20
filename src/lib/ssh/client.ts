@@ -54,7 +54,7 @@ export class SSHClient {
   async execute(command: string): Promise<CommandResult> {
     return new Promise((resolve) => {
       const startTime = Date.now();
-      
+
       this.client.exec(command, (err, stream) => {
         if (err) {
           resolve({
@@ -92,7 +92,7 @@ export class SSHClient {
 
   async executeWithProgress(
     command: string,
-    onData: (data: string) => void
+    onData: (data: string) => void,
   ): Promise<CommandResult> {
     return new Promise((resolve) => {
       const startTime = Date.now();
@@ -175,7 +175,9 @@ export class SSHClient {
   }
 }
 
-export async function createSSHClient(connection: SSHConnection): Promise<SSHClient> {
+export async function createSSHClient(
+  connection: SSHConnection,
+): Promise<SSHClient> {
   const client = new SSHClient(connection);
   await client.connect();
   return client;

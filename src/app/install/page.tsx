@@ -6,10 +6,30 @@ import { Sidebar, Header } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Server, Network, HardDrive, Terminal, Loader2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Check,
+  Server,
+  Network,
+  HardDrive,
+  Terminal,
+  Loader2,
+} from "lucide-react";
 
 const GAMES = [
   { id: "csgo", name: "Counter-Strike 2", defaultPort: 27015 },
@@ -51,7 +71,7 @@ export default function InstallPage() {
   const [maxPlayers, setMaxPlayers] = useState("");
 
   const addOutput = (line: string) => {
-    setInstallOutput(prev => [...prev, line]);
+    setInstallOutput((prev) => [...prev, line]);
   };
 
   const handleNext = () => {
@@ -117,7 +137,7 @@ export default function InstallPage() {
     setInstallOutput([]);
 
     try {
-      const game = GAMES.find(g => g.id === selectedGame);
+      const game = GAMES.find((g) => g.id === selectedGame);
       if (!game) throw new Error("Game not selected");
 
       const response = await fetch("/api/servers", {
@@ -153,11 +173,11 @@ export default function InstallPage() {
       addOutput(`Installation started for ${game.name}...`);
       addOutput(`Server name: ${serverName || game.id}`);
       addOutput(`Install path: ${installPath || `/home/${username}`}`);
-      
+
       // For now, we'll just simulate progress
       // In reality we'd stream output from the SSH command
       for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
         addOutput(`Progress: ${i}%`);
       }
 
@@ -191,18 +211,23 @@ export default function InstallPage() {
               <div className="flex items-center justify-between">
                 {steps.map((s, idx) => (
                   <div key={s.id} className="flex items-center">
-                    <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                      step === s.id || steps.findIndex(st => st.id === step) > idx
-                        ? "bg-primary border-primary text-primary-foreground"
-                        : "border-muted-foreground text-muted-foreground"
-                    }`}>
-                      {steps.findIndex(st => st.id === step) > idx ? (
+                    <div
+                      className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                        step === s.id ||
+                        steps.findIndex((st) => st.id === step) > idx
+                          ? "bg-primary border-primary text-primary-foreground"
+                          : "border-muted-foreground text-muted-foreground"
+                      }`}
+                    >
+                      {steps.findIndex((st) => st.id === step) > idx ? (
                         <Check className="w-5 h-5" />
                       ) : (
                         <s.icon className="w-5 h-5" />
                       )}
                     </div>
-                    <span className="ml-2 text-sm font-medium hidden sm:inline">{s.label}</span>
+                    <span className="ml-2 text-sm font-medium hidden sm:inline">
+                      {s.label}
+                    </span>
                     {idx < steps.length - 1 && (
                       <div className="flex-1 h-0.5 mx-4 bg-muted" />
                     )}
@@ -222,7 +247,8 @@ export default function InstallPage() {
                   {step === "complete" && "Installation Complete!"}
                 </CardTitle>
                 <CardDescription>
-                  {step === "connection" && "Enter SSH credentials for the remote host"}
+                  {step === "connection" &&
+                    "Enter SSH credentials for the remote host"}
                   {step === "game" && "Choose which game server to install"}
                   {step === "config" && "Configure server settings"}
                   {step === "deps" && "Verify dependencies are available"}
@@ -274,7 +300,9 @@ export default function InstallPage() {
                       <div className="flex gap-4">
                         <Button
                           type="button"
-                          variant={authType === "password" ? "secondary" : "outline"}
+                          variant={
+                            authType === "password" ? "secondary" : "outline"
+                          }
                           onClick={() => setAuthType("password")}
                           className="flex-1"
                         >
@@ -319,12 +347,15 @@ export default function InstallPage() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="game">Select Game</Label>
-                      <Select value={selectedGame} onValueChange={setSelectedGame}>
+                      <Select
+                        value={selectedGame}
+                        onValueChange={setSelectedGame}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Choose a game..." />
                         </SelectTrigger>
                         <SelectContent>
-                          {GAMES.map(game => (
+                          {GAMES.map((game) => (
                             <SelectItem key={game.id} value={game.id}>
                               {game.name}
                             </SelectItem>
@@ -334,7 +365,13 @@ export default function InstallPage() {
                     </div>
                     {selectedGame && (
                       <div className="text-sm text-muted-foreground">
-                        <p>Default port: {GAMES.find(g => g.id === selectedGame)?.defaultPort}</p>
+                        <p>
+                          Default port:{" "}
+                          {
+                            GAMES.find((g) => g.id === selectedGame)
+                              ?.defaultPort
+                          }
+                        </p>
                         <p>Make sure this game is supported by LinuxGSM.</p>
                       </div>
                     )}
@@ -352,7 +389,8 @@ export default function InstallPage() {
                         onChange={(e) => setServerName(e.target.value)}
                       />
                       <p className="text-sm text-muted-foreground">
-                        This will be the LinuxGSM script name (e.g., ./{serverName || 'myserver'})
+                        This will be the LinuxGSM script name (e.g., ./
+                        {serverName || "myserver"})
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -370,7 +408,9 @@ export default function InstallPage() {
                         <Input
                           id="gamePort"
                           type="number"
-                          placeholder={GAMES.find(g => g.id === selectedGame)?.defaultPort.toString()}
+                          placeholder={GAMES.find(
+                            (g) => g.id === selectedGame,
+                          )?.defaultPort.toString()}
                           value={gamePort}
                           onChange={(e) => setGamePort(e.target.value)}
                         />
@@ -391,13 +431,19 @@ export default function InstallPage() {
 
                 {step === "deps" && (
                   <div className="space-y-4">
-                    <p>Checking if the remote host has required dependencies...</p>
+                    <p>
+                      Checking if the remote host has required dependencies...
+                    </p>
                     <div className="bg-muted rounded-lg p-4 font-mono text-sm">
                       {installOutput.length === 0 ? (
-                        <span className="text-muted-foreground">Waiting to check...</span>
+                        <span className="text-muted-foreground">
+                          Waiting to check...
+                        </span>
                       ) : (
                         installOutput.map((line, i) => (
-                          <div key={i} className="mb-1">{line}</div>
+                          <div key={i} className="mb-1">
+                            {line}
+                          </div>
                         ))
                       )}
                       {loading && (
@@ -414,7 +460,12 @@ export default function InstallPage() {
                   <div className="space-y-4">
                     <div className="bg-black text-green-400 font-mono p-4 rounded-lg h-64 overflow-y-auto">
                       {installOutput.map((line, i) => (
-                        <div key={i} className="mb-1 text-sm whitespace-pre-wrap">{line}</div>
+                        <div
+                          key={i}
+                          className="mb-1 text-sm whitespace-pre-wrap"
+                        >
+                          {line}
+                        </div>
                       ))}
                       {loading && (
                         <div className="flex items-center gap-2 text-green-400">
@@ -431,15 +482,23 @@ export default function InstallPage() {
                     <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Check className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">Installation Complete!</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Installation Complete!
+                    </h3>
                     <p className="text-muted-foreground mb-6">
-                      Your {selectedGame} server has been installed successfully.
+                      Your {selectedGame} server has been installed
+                      successfully.
                     </p>
                     <div className="flex justify-center gap-4">
                       <Button onClick={() => router.push("/")}>
                         Go to Dashboard
                       </Button>
-                      <Button variant="outline" onClick={() => router.push(`/server/new?name=${serverName}`)}>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          router.push(`/server/new?name=${serverName}`)
+                        }
+                      >
                         Configure Server
                       </Button>
                     </div>
@@ -467,7 +526,9 @@ export default function InstallPage() {
                         {loading ? "Installing..." : "Start Installation"}
                       </Button>
                     )}
-                    {(step === "connection" || step === "game" || step === "config") && (
+                    {(step === "connection" ||
+                      step === "game" ||
+                      step === "config") && (
                       <Button
                         onClick={handleNext}
                         disabled={

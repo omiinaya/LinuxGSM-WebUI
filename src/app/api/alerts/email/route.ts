@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (!host || !port || !from || !to) {
       return NextResponse.json(
         { error: "host, port, from, and to are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     console.error("Email alert error:", error);
     return NextResponse.json(
       { error: "Failed to send email", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

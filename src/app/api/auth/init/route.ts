@@ -8,7 +8,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ initialized: true });
   } catch (error) {
     console.error("Auth init error:", error);
-    return NextResponse.json({ error: "Initialization failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Initialization failed" },
+      { status: 500 },
+    );
   }
 }
 

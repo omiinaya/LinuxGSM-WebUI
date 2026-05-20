@@ -22,11 +22,14 @@ interface SSHConnectionModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function SSHConnectionModal({ open, onOpenChange }: SSHConnectionModalProps) {
+export function SSHConnectionModal({
+  open,
+  onOpenChange,
+}: SSHConnectionModalProps) {
   const { addServer } = useServersStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Connection form state
   const [host, setHost] = useState("");
   const [port, setPort] = useState(22);
@@ -35,13 +38,13 @@ export function SSHConnectionModal({ open, onOpenChange }: SSHConnectionModalPro
   const [password, setPassword] = useState("");
   const [privateKey, setPrivateKey] = useState("");
   const [basePath, setBasePath] = useState("/home");
-  
+
   // Server form state (manual add)
   const [serverName, setServerName] = useState("");
   const [game, setGame] = useState("");
   const [gameName, setGameName] = useState("");
   const [installPath, setInstallPath] = useState("");
-  
+
   const handleDiscover = async () => {
     setLoading(true);
     setError(null);
@@ -260,7 +263,10 @@ export function SSHConnectionModal({ open, onOpenChange }: SSHConnectionModalPro
             )}
 
             <DialogFooter>
-              <Button onClick={handleDiscover} disabled={loading || !host || !username}>
+              <Button
+                onClick={handleDiscover}
+                disabled={loading || !host || !username}
+              >
                 {loading ? "Scanning..." : "Scan for Servers"}
               </Button>
             </DialogFooter>
@@ -393,7 +399,10 @@ export function SSHConnectionModal({ open, onOpenChange }: SSHConnectionModalPro
             )}
 
             <DialogFooter>
-              <Button onClick={handleManualAdd} disabled={loading || !host || !username || !serverName}>
+              <Button
+                onClick={handleManualAdd}
+                disabled={loading || !host || !username || !serverName}
+              >
                 {loading ? "Adding..." : "Add Server"}
               </Button>
             </DialogFooter>

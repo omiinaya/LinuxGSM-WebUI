@@ -15,13 +15,17 @@ export async function GET(request: NextRequest) {
 
   try {
     // Scan common paths for LinuxGSM installations
-    const discovered = await discoverLocalLinuxGSM(["/home", "/opt", "/usr/local"]);
+    const discovered = await discoverLocalLinuxGSM([
+      "/home",
+      "/opt",
+      "/usr/local",
+    ]);
 
     // Transform to server objects matching our Server type (partial)
-    const servers = discovered.map(d => ({
+    const servers = discovered.map((d) => ({
       id: `local-${crypto.randomUUID()}`,
       name: d.name,
-      game: d.gameName.toLowerCase().replace(/\s+/g, ''),
+      game: d.gameName.toLowerCase().replace(/\s+/g, ""),
       gameName: d.gameName,
       status: "unknown" as const,
       ip: "127.0.0.1",
@@ -48,9 +52,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ servers });
   } catch (error) {
     console.error("Local discovery error:", error);
-    return NextResponse.json(
-      { error: "Discovery failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Discovery failed" }, { status: 500 });
   }
 }

@@ -7,7 +7,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 
 export default function ProfilePage() {
@@ -185,7 +192,8 @@ export default function ProfilePage() {
               <CardHeader>
                 <CardTitle>Change Password</CardTitle>
                 <CardDescription>
-                  Update your password. This will sign you out of all other sessions.
+                  Update your password. This will sign you out of all other
+                  sessions.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -226,7 +234,9 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
                     <Input
                       id="confirmPassword"
                       type="password"
@@ -248,7 +258,9 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
                     <Input
                       id="confirmPassword"
                       type="password"
@@ -257,7 +269,11 @@ export default function ProfilePage() {
                       required
                     />
                   </div>
-                  <Button type="submit" disabled={submitting} className="w-full">
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full"
+                  >
                     {submitting ? "Changing..." : "Change Password"}
                   </Button>
                 </form>
@@ -279,13 +295,21 @@ export default function ProfilePage() {
                       Two-factor authentication is enabled.
                     </p>
                     {!showDisableConfirm ? (
-                      <Button variant="destructive" onClick={() => setShowDisableConfirm(true)}>
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowDisableConfirm(true)}
+                      >
                         Disable 2FA
                       </Button>
                     ) : (
-                      <form onSubmit={handleDisable2FA} className="space-y-4 max-w-sm">
+                      <form
+                        onSubmit={handleDisable2FA}
+                        className="space-y-4 max-w-sm"
+                      >
                         <div className="space-y-2">
-                          <Label htmlFor="disablePassword">Confirm Password</Label>
+                          <Label htmlFor="disablePassword">
+                            Confirm Password
+                          </Label>
                           <Input
                             id="disablePassword"
                             type="password"
@@ -300,10 +324,20 @@ export default function ProfilePage() {
                           </div>
                         )}
                         <div className="flex gap-2">
-                          <Button type="submit" variant="destructive" disabled={disableLoading}>
-                            {disableLoading ? "Disabling..." : "Confirm Disable"}
+                          <Button
+                            type="submit"
+                            variant="destructive"
+                            disabled={disableLoading}
+                          >
+                            {disableLoading
+                              ? "Disabling..."
+                              : "Confirm Disable"}
                           </Button>
-                          <Button type="button" variant="ghost" onClick={() => setShowDisableConfirm(false)}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setShowDisableConfirm(false)}
+                          >
                             Cancel
                           </Button>
                         </div>
@@ -313,29 +347,40 @@ export default function ProfilePage() {
                 ) : (
                   <div>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Two-factor authentication is not enabled. Use an authenticator app to generate verification codes.
+                      Two-factor authentication is not enabled. Use an
+                      authenticator app to generate verification codes.
                     </p>
                     {!showSetup ? (
                       <Button onClick={fetchSecret}>Enable 2FA</Button>
                     ) : (
-                      <form onSubmit={handleEnable2FA} className="space-y-4 max-w-sm">
+                      <form
+                        onSubmit={handleEnable2FA}
+                        className="space-y-4 max-w-sm"
+                      >
                         <div className="space-y-2">
                           <Label>Secret</Label>
                           <code className="block p-3 bg-muted rounded text-sm font-mono break-all">
                             {secret}
                           </code>
                           <p className="text-xs text-muted-foreground">
-                            Add this secret to your authenticator app (Google Authenticator, Authy, etc.)
+                            Add this secret to your authenticator app (Google
+                            Authenticator, Authy, etc.)
                           </p>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="verificationCode">Verification Code</Label>
+                          <Label htmlFor="verificationCode">
+                            Verification Code
+                          </Label>
                           <Input
                             id="verificationCode"
                             type="text"
                             placeholder="123456"
                             value={verificationCode}
-                            onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                            onChange={(e) =>
+                              setVerificationCode(
+                                e.target.value.replace(/\D/g, "").slice(0, 6),
+                              )
+                            }
                             required
                             maxLength={6}
                           />
@@ -347,9 +392,15 @@ export default function ProfilePage() {
                         )}
                         <div className="flex gap-2">
                           <Button type="submit" disabled={enableLoading}>
-                            {enableLoading ? "Verifying..." : "Verify and Enable"}
+                            {enableLoading
+                              ? "Verifying..."
+                              : "Verify and Enable"}
                           </Button>
-                          <Button type="button" variant="ghost" onClick={() => setShowSetup(false)}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setShowSetup(false)}
+                          >
                             Cancel
                           </Button>
                         </div>

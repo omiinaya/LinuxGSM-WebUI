@@ -1,7 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { useUIStore, useServersStore } from "@/stores";
 import { Button } from "@/components/ui/button";
 import {
@@ -102,7 +110,10 @@ export function CommandPalette() {
   };
 
   return (
-    <CommandDialog open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen}>
+    <CommandDialog
+      open={commandPaletteOpen}
+      onOpenChange={setCommandPaletteOpen}
+    >
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
@@ -129,32 +140,42 @@ export function CommandPalette() {
             <CommandItem onSelect={() => handleAction("check-update")}>
               <Download className="mr-2 h-4 w-4" />
               <span>Check for Updates</span>
-              <span className="ml-auto text-xs text-muted-foreground">check-update</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                check-update
+              </span>
             </CommandItem>
             <CommandItem onSelect={() => handleAction("update")}>
               <Upload className="mr-2 h-4 w-4" />
               <span>Update Server</span>
-              <span className="ml-auto text-xs text-muted-foreground">update</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                update
+              </span>
             </CommandItem>
             <CommandItem onSelect={() => handleAction("validate")}>
               <Activity className="mr-2 h-4 w-4" />
               <span>Validate Server</span>
-              <span className="ml-auto text-xs text-muted-foreground">validate</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                validate
+              </span>
             </CommandItem>
             <CommandItem onSelect={() => handleAction("backup")}>
               <FileJson className="mr-2 h-4 w-4" />
               <span>Create Backup</span>
-              <span className="ml-auto text-xs text-muted-foreground">backup</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                backup
+              </span>
             </CommandItem>
           </CommandGroup>
         )}
 
         <CommandGroup heading="Navigation">
           {selectedServer && (
-            <CommandItem onSelect={() => {
-              setCommandPaletteOpen(false);
-              window.location.href = `/server/${selectedServer.id}`;
-            }}>
+            <CommandItem
+              onSelect={() => {
+                setCommandPaletteOpen(false);
+                window.location.href = `/server/${selectedServer.id}`;
+              }}
+            >
               <Server className="mr-2 h-4 w-4" />
               <span>View Server Details</span>
             </CommandItem>
@@ -166,10 +187,12 @@ export function CommandPalette() {
         </CommandGroup>
 
         <CommandGroup heading="Settings">
-          <CommandItem onSelect={() => {
-            setCommandPaletteOpen(false);
-            // Navigate to settings page
-          }}>
+          <CommandItem
+            onSelect={() => {
+              setCommandPaletteOpen(false);
+              // Navigate to settings page
+            }}
+          >
             <Settings className="mr-2 h-4 w-4" />
             <span>Open Settings</span>
           </CommandItem>

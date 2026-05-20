@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   if (!password) {
     return NextResponse.json(
       { error: "Password required to disable 2FA" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

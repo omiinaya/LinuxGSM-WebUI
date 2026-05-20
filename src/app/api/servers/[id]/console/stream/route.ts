@@ -21,10 +21,13 @@ export async function GET(request: NextRequest) {
   const { connection, server } = body;
 
   if (!connection || !server) {
-    return new Response(JSON.stringify({ error: "Connection and server details required" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: "Connection and server details required" }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 
   // Set SSE headers
@@ -35,7 +38,7 @@ export async function GET(request: NextRequest) {
       try {
         await client.connect();
         const service = new LinuxGSMService(client, server);
-        
+
         // Send initial log content
         try {
           const initialLog = await service.getConsoleLog(parseInt(lines));
@@ -49,7 +52,7 @@ export async function GET(request: NextRequest) {
         // We'll use a simple polling approach since SSH doesn't support persistent streaming easily
         let lastPosition = 0;
         let lastContent = "";
-        
+
         const pollInterval = setInterval(async () => {
           if (server.status !== "running") {
             clearInterval(pollInterval);
@@ -61,14 +64,14 @@ export async function GET(request: NextRequest) {
           try {
             // Get full log and calculate what's new
             const fullLog = await service.getConsoleLog(parseInt(lines) * 2); // Get more lines
-            const linesArr = fullLog.split('\n');
-            
+            const linesArr = fullLog.split("\n");
+
             // Find new lines since last poll
             const newLines = linesArr.slice(lastPosition);
             if (newLines.length > 0) {
-              const eventData = `event: line\ndata: ${JSON.stringify({ 
-                lines: newLines.filter(l => l.trim()),
-                full: fullLog 
+              const eventData = `event: line\ndata: ${JSON.stringify({
+                lines: newLines.filter((l) => l.trim()),
+                full: fullLog,
               })}\n\n`;
               controller.enqueue(encoder.encode(eventData));
               lastPosition = linesArr.length;
@@ -97,7 +100,7 @@ export async function GET(request: NextRequest) {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
       "X-Content-Type-Options": "nosniff",
     },
   });

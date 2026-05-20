@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { 
-  Server, 
-  Settings, 
-  Terminal, 
-  Bell, 
-  Shield, 
+import {
+  Server,
+  Settings,
+  Terminal,
+  Bell,
+  Shield,
   HelpCircle,
   ChevronLeft,
   ChevronRight,
@@ -16,7 +16,7 @@ import {
   User,
   Activity,
   FileText,
-  Package
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore, useServersStore } from "@/stores";
@@ -36,17 +36,18 @@ interface SidebarProps {
   className?: string;
 }
 
-
 export function Sidebar({ className }: SidebarProps) {
-  const { sidebarOpen, setSidebarOpen, toggleSidebar, setShowConnectionModal } = useUIStore();
+  const { sidebarOpen, setSidebarOpen, toggleSidebar, setShowConnectionModal } =
+    useUIStore();
   const { servers, selectedServerId, selectServer } = useServersStore();
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  const runningServers = servers.filter(s => s.status === "running").length;
+  const runningServers = servers.filter((s) => s.status === "running").length;
 
-  const filteredServers = servers.filter(s => 
-    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.gameName.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredServers = servers.filter(
+    (s) =>
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.gameName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const { user } = useAuth();
@@ -61,16 +62,41 @@ export function Sidebar({ className }: SidebarProps) {
   ];
 
   let navigation = [...baseNavigation];
-  
+
   if (user) {
-    navigation.push({ name: "Profile", icon: User, href: "/profile", badge: 0 });
+    navigation.push({
+      name: "Profile",
+      icon: User,
+      href: "/profile",
+      badge: 0,
+    });
   }
-  
+
   if (user?.role === "admin") {
-    navigation.push({ name: "Sessions", icon: Activity, href: "/sessions", badge: 0 });
-    navigation.push({ name: "Audit Log", icon: FileText, href: "/admin/audit", badge: 0 });
-    navigation.push({ name: "Catalogue", icon: Package, href: "/catalogue", badge: 0 });
-    navigation.push({ name: "Admin", icon: Shield, href: "/admin/users", badge: 0 });
+    navigation.push({
+      name: "Sessions",
+      icon: Activity,
+      href: "/sessions",
+      badge: 0,
+    });
+    navigation.push({
+      name: "Audit Log",
+      icon: FileText,
+      href: "/admin/audit",
+      badge: 0,
+    });
+    navigation.push({
+      name: "Catalogue",
+      icon: Package,
+      href: "/catalogue",
+      badge: 0,
+    });
+    navigation.push({
+      name: "Admin",
+      icon: Shield,
+      href: "/admin/users",
+      badge: 0,
+    });
   }
 
   return (
@@ -79,7 +105,7 @@ export function Sidebar({ className }: SidebarProps) {
         className={cn(
           "flex flex-col h-screen border-r bg-card transition-all duration-300",
           sidebarOpen ? "w-64" : "w-16",
-          className
+          className,
         )}
       >
         {/* Logo */}
@@ -98,7 +124,11 @@ export function Sidebar({ className }: SidebarProps) {
             onClick={toggleSidebar}
             className={cn(!sidebarOpen && "mx-auto")}
           >
-            {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            {sidebarOpen ? (
+              <ChevronLeft className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
           </Button>
         </div>
 
@@ -132,17 +162,23 @@ export function Sidebar({ className }: SidebarProps) {
               {filteredServers.map((server) => (
                 <Button
                   key={server.id}
-                  variant={selectedServerId === server.id ? "secondary" : "ghost"}
+                  variant={
+                    selectedServerId === server.id ? "secondary" : "ghost"
+                  }
                   className={cn(
                     "w-full justify-start gap-2 h-10",
-                    selectedServerId === server.id && "bg-secondary"
+                    selectedServerId === server.id && "bg-secondary",
                   )}
                   onClick={() => selectServer(server.id)}
                 >
-                  <div className={cn(
-                    "w-2 h-2 rounded-full",
-                    server.status === "running" ? "bg-green-500" : "bg-gray-400"
-                  )} />
+                  <div
+                    className={cn(
+                      "w-2 h-2 rounded-full",
+                      server.status === "running"
+                        ? "bg-green-500"
+                        : "bg-gray-400",
+                    )}
+                  />
                   <span className="truncate">{server.name}</span>
                 </Button>
               ))}
@@ -159,7 +195,7 @@ export function Sidebar({ className }: SidebarProps) {
                   variant="ghost"
                   className={cn(
                     "w-full justify-start gap-2",
-                    sidebarOpen ? "px-3" : "px-2"
+                    sidebarOpen ? "px-3" : "px-2",
                   )}
                   onClick={() => router.push(item.href)}
                 >
@@ -173,9 +209,7 @@ export function Sidebar({ className }: SidebarProps) {
                 </Button>
               </TooltipTrigger>
               {!sidebarOpen && (
-                <TooltipContent side="right">
-                  {item.name}
-                </TooltipContent>
+                <TooltipContent side="right">{item.name}</TooltipContent>
               )}
             </Tooltip>
           ))}
@@ -190,7 +224,7 @@ export function Sidebar({ className }: SidebarProps) {
                   variant="ghost"
                   className={cn(
                     "w-full justify-start gap-2 text-primary",
-                    sidebarOpen ? "px-3" : "px-2"
+                    sidebarOpen ? "px-3" : "px-2",
                   )}
                   onClick={() => setShowConnectionModal(true)}
                 >
@@ -199,9 +233,7 @@ export function Sidebar({ className }: SidebarProps) {
                 </Button>
               </TooltipTrigger>
               {!sidebarOpen && (
-                <TooltipContent side="right">
-                  Add Server
-                </TooltipContent>
+                <TooltipContent side="right">Add Server</TooltipContent>
               )}
             </Tooltip>
           </div>

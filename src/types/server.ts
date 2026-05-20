@@ -1,10 +1,10 @@
-export type ServerStatus = 
-  | "running" 
-  | "stopped" 
-  | "starting" 
-  | "stopping" 
-  | "installing" 
-  | "updating" 
+export type ServerStatus =
+  | "running"
+  | "stopped"
+  | "starting"
+  | "stopping"
+  | "installing"
+  | "updating"
   | "crashed"
   | "unknown";
 

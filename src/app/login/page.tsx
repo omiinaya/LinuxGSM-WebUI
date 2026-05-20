@@ -6,7 +6,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Terminal } from "lucide-react";
 
 export default function LoginPage() {
@@ -62,31 +69,35 @@ export default function LoginPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
-               <Input
-                 id="username"
-                 placeholder="admin"
-                 value={username}
-                 onChange={(e) => setUsername(e.target.value)}
-                 required
-                 autoFocus
-                 autoComplete="username"
-               />
+              <Input
+                id="username"
+                placeholder="admin"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                autoFocus
+                autoComplete="username"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-               <Input
-                 id="password"
-                 type="password"
-                 placeholder="••••••••"
-                 value={password}
-                 onChange={(e) => setPassword(e.target.value)}
-                 required
-                 autoComplete="current-password"
-               />
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full" disabled={submitting || !username || !password}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={submitting || !username || !password}
+            >
               {submitting ? "Signing in..." : "Sign In"}
             </Button>
           </CardFooter>

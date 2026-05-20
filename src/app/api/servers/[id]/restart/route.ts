@@ -5,14 +5,17 @@ import { logServerEvent } from "@/lib/audit";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const user = await getUserFromRequest(request);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (user.role === "viewer") {
-    return NextResponse.json({ error: "Forbidden: insufficient permissions" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Forbidden: insufficient permissions" },
+      { status: 403 },
+    );
   }
 
   try {
@@ -20,7 +23,10 @@ export async function POST(
     const { connection, server } = body;
 
     if (!connection) {
-      return NextResponse.json({ error: "Connection details required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Connection details required" },
+        { status: 400 },
+      );
     }
 
     const { service, cleanup } = await getService(connection, server);
@@ -28,7 +34,9 @@ export async function POST(
     try {
       const result = await service.restart();
       if (result.success) {
-        await logServerEvent("restart", user.id, user.username, server.id, { serverName: server.name });
+        await logServerEvent("restart", user.id, user.username, server.id, {
+          serverName: server.name,
+        });
       }
       return NextResponse.json(result);
     } finally {
@@ -36,6 +44,9 @@ export async function POST(
     }
   } catch (error) {
     console.error("Restart error:", error);
-    return NextResponse.json({ error: "Failed to restart server" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to restart server" },
+      { status: 500 },
+    );
   }
 }

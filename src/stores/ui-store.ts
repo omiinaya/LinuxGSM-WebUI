@@ -10,7 +10,7 @@ interface UIState {
   commandPaletteOpen: boolean;
   activeTab: string;
   showConnectionModal: boolean;
-  
+
   // Actions
   setTheme: (theme: Theme) => void;
   setViewMode: (mode: ViewMode) => void;
@@ -34,7 +34,8 @@ export const useUIStore = create<UIState>()((set) => ({
   setViewMode: (viewMode) => set({ viewMode }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
-  toggleCommandPalette: () => set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
+  toggleCommandPalette: () =>
+    set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
   setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setShowConnectionModal: (open) => set({ showConnectionModal: open }),

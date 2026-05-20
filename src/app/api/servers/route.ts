@@ -4,7 +4,10 @@ import { SSHClient } from "@/lib/ssh/client";
 import { LinuxGSMService } from "@/lib/linuxgsm/commands";
 import { LocalExecutor } from "@/lib/ssh/local-executor";
 import { LocalLinuxGSMService } from "@/lib/ssh/local-lgsm-service";
-import { discoverServers, createServerFromDiscovery } from "@/lib/linuxgsm/detector";
+import {
+  discoverServers,
+  createServerFromDiscovery,
+} from "@/lib/linuxgsm/detector";
 import { getUserFromRequest } from "@/lib/auth";
 
 // GET /api/servers - List all configured servers
@@ -22,7 +25,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch servers" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -37,7 +40,10 @@ export async function POST(request: NextRequest) {
   // Role check: mutating actions require at least operator
   const isMutating = true; // all current POST actions are mutating
   if (isMutating && user.role === "viewer") {
-    return NextResponse.json({ error: "Forbidden: insufficient permissions" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Forbidden: insufficient permissions" },
+      { status: 403 },
+    );
   }
 
   try {
@@ -51,13 +57,13 @@ export async function POST(request: NextRequest) {
 
       try {
         const discovered = await discoverServers(client, basePath || "/home");
-        
+
         const servers = await Promise.all(
-          discovered.map(d => createServerFromDiscovery(client, d))
+          discovered.map((d) => createServerFromDiscovery(client, d)),
         );
 
         // Update SSH connection info for each server
-        servers.forEach(server => {
+        servers.forEach((server) => {
           server.sshConnection = connection;
         });
 
@@ -70,8 +76,8 @@ export async function POST(request: NextRequest) {
     if (action === "add" && connection) {
       // Add a manually configured server
       // Return the connection config for client to store
-      return NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         server: {
           id: crypto.randomUUID(),
           name: connection.serverName || "Unknown",
@@ -96,7 +102,7 @@ export async function POST(request: NextRequest) {
           lastUpdate: "",
           createdAt: new Date().toISOString(),
           sshConnection: connection,
-        }
+        },
       });
     }
 
@@ -108,50 +114,63 @@ export async function POST(request: NextRequest) {
       try {
         // Run dependency check (LinuxGSM has detect-deps command)
         // For now we simulate or run a basic check
-        const result = await client.execute("which steamcmd && which tmux && which git");
+        const result = await client.execute(
+          "which steamcmd && which tmux && which git",
+        );
         const missing: string[] = [];
-        
+
         if (!result.output.includes("steamcmd")) missing.push("steamcmd");
         if (!result.output.includes("tmux")) missing.push("tmux");
         if (!result.output.includes("git")) missing.push("git");
 
-        return NextResponse.json({ 
+        return NextResponse.json({
           success: missing.length === 0,
-          missing 
+          missing,
         });
       } finally {
         await client.disconnect();
       }
     }
 
-    if ((action === "install" || action === "auto-install") && connection && body.game) {
+    if (
+      (action === "install" || action === "auto-install") &&
+      connection &&
+      body.game
+    ) {
       // Install a new game server
       const { game } = body;
-      
+
       if (connection.type === "local") {
         // Local installation directly on the host
-        const executor = new LocalExecutor({ workingDir: connection.workingDir || process.cwd() });
+        const executor = new LocalExecutor({
+          workingDir: connection.workingDir || process.cwd(),
+        });
         const scriptPath = `${connection.installDir || "/home"}/${game.id}server`;
-        
+
         try {
           // Download the LinuxGSM script if it doesn't exist
           const scriptExists = await executor.fileExists(scriptPath);
           if (!scriptExists) {
             // Download and setup
             const homeDir = connection.installDir || "/home";
-            await executor.execute(`cd ${homeDir} && curl -L https://github.com/GameServerManagers/LinuxGSM/archive/refs/heads/master.zip -o lgsm.zip`);
+            await executor.execute(
+              `cd ${homeDir} && curl -L https://github.com/GameServerManagers/LinuxGSM/archive/refs/heads/master.zip -o lgsm.zip`,
+            );
             await executor.execute(`cd ${homeDir} && unzip -o lgsm.zip`);
-            await executor.execute(`cd ${homeDir} && mv LinuxGSM-master/linuxgsm.sh ${game.id}server`);
+            await executor.execute(
+              `cd ${homeDir} && mv LinuxGSM-master/linuxgsm.sh ${game.id}server`,
+            );
             await executor.execute(`chmod +x ${scriptPath}`);
           }
 
           // Run install or auto-install
-          const installCmd = action === "auto-install"
-            ? `${scriptPath} auto-install`
-            : `${scriptPath} install`;
+          const installCmd =
+            action === "auto-install"
+              ? `${scriptPath} auto-install`
+              : `${scriptPath} install`;
 
           const result = await executor.execute(installCmd);
-          
+
           return NextResponse.json({
             success: result.success,
             message: result.output,
@@ -160,13 +179,13 @@ export async function POST(request: NextRequest) {
         } catch (err: any) {
           return NextResponse.json(
             { error: err.message || "Installation failed" },
-            { status: 500 }
+            { status: 500 },
           );
         }
       } else {
         // Remote installation via SSH
         const scriptPath = `/home/${connection.username}/${game.id}server`;
-        
+
         const client = new SSHClient(connection);
         await client.connect();
 
@@ -184,16 +203,17 @@ export async function POST(request: NextRequest) {
           await client.execute(downloadScript);
 
           // Run install or auto-install
-          const installCmd = action === "auto-install" 
-            ? `${scriptPath} auto-install`
-            : `${scriptPath} install`;
-          
+          const installCmd =
+            action === "auto-install"
+              ? `${scriptPath} auto-install`
+              : `${scriptPath} install`;
+
           await client.execute(installCmd);
 
-          return NextResponse.json({ 
+          return NextResponse.json({
             success: true,
             message: "Installation completed",
-            scriptPath
+            scriptPath,
           });
         } finally {
           await client.disconnect();
@@ -203,13 +223,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: "Invalid action or missing parameters" },
-      { status: 400 }
+      { status: 400 },
     );
   } catch (error) {
     console.error("API error:", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

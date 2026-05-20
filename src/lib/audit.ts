@@ -44,7 +44,9 @@ export async function getAuditLogs(limit?: number): Promise<AuditEntry[]> {
   return logs;
 }
 
-export async function writeAuditEntry(entry: Omit<AuditEntry, "id" | "timestamp">): Promise<AuditEntry> {
+export async function writeAuditEntry(
+  entry: Omit<AuditEntry, "id" | "timestamp">,
+): Promise<AuditEntry> {
   const logs = await readAuditLogs();
   const newEntry: AuditEntry = {
     ...entry,
@@ -62,7 +64,7 @@ export async function logAuthEvent(
   userId?: string,
   username?: string,
   details?: Record<string, any>,
-  ip?: string
+  ip?: string,
 ) {
   await writeAuditEntry({
     userId,
@@ -75,12 +77,23 @@ export async function logAuthEvent(
 
 // Helper to log server operations
 export async function logServerEvent(
-  action: "start" | "stop" | "restart" | "backup" | "restore" | "config_save" | "validate" | "port_check" | "update" | "cron_add" | "command",
+  action:
+    | "start"
+    | "stop"
+    | "restart"
+    | "backup"
+    | "restore"
+    | "config_save"
+    | "validate"
+    | "port_check"
+    | "update"
+    | "cron_add"
+    | "command",
   userId?: string,
   username?: string,
   resourceId?: string,
   details?: Record<string, any>,
-  ip?: string
+  ip?: string,
 ) {
   await writeAuditEntry({
     userId,
@@ -100,7 +113,7 @@ export async function logAdminEvent(
   username?: string,
   resourceId?: string,
   details?: Record<string, any>,
-  ip?: string
+  ip?: string,
 ) {
   await writeAuditEntry({
     userId,
@@ -114,15 +127,17 @@ export async function logAdminEvent(
 }
 
 // Purge old logs (e.g., keep last 90 days)
-export async function purgeOldLogs(olderThanDays: number = 90): Promise<number> {
+export async function purgeOldLogs(
+  olderThanDays: number = 90,
+): Promise<number> {
   const logs = await readAuditLogs();
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - olderThanDays);
-  
+
   const before = logs.length;
-  const filtered = logs.filter(entry => new Date(entry.timestamp) > cutoff);
+  const filtered = logs.filter((entry) => new Date(entry.timestamp) > cutoff);
   const deleted = before - filtered.length;
-  
+
   await writeAuditLogs(filtered);
   return deleted;
 }

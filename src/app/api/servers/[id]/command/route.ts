@@ -5,14 +5,17 @@ import { logServerEvent } from "@/lib/audit";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const user = await getUserFromRequest(request);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (user.role === "viewer") {
-    return NextResponse.json({ error: "Forbidden: insufficient permissions" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Forbidden: insufficient permissions" },
+      { status: 403 },
+    );
   }
 
   try {
@@ -20,20 +23,37 @@ export async function POST(
     const { connection, server, command } = body;
 
     if (!connection || !command) {
-      return NextResponse.json({ error: "Connection and command required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Connection and command required" },
+        { status: 400 },
+      );
     }
 
     const { service, cleanup } = await getService(connection, server);
 
     try {
       const result = await service.sendCommand(command);
-      const importantCommands = ["backup", "update", "check-update", "validate", "stop", "start", "restart"];
+      const importantCommands = [
+        "backup",
+        "update",
+        "check-update",
+        "validate",
+        "stop",
+        "start",
+        "restart",
+      ];
       if (result.success && importantCommands.includes(command)) {
-        await logServerEvent(command as any, user.id, user.username, server.id, {
-          serverName: server.name,
-          command,
-          output: result.output,
-        });
+        await logServerEvent(
+          command as any,
+          user.id,
+          user.username,
+          server.id,
+          {
+            serverName: server.name,
+            command,
+            output: result.output,
+          },
+        );
       }
       return NextResponse.json(result);
     } finally {
@@ -41,6 +61,9 @@ export async function POST(
     }
   } catch (error) {
     console.error("Command error:", error);
-    return NextResponse.json({ error: "Failed to send command" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to send command" },
+      { status: 500 },
+    );
   }
 }

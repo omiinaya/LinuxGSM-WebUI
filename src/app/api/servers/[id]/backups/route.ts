@@ -4,7 +4,7 @@ import { getService } from "@/lib/ssh/service-provider";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const user = await getUserFromRequest(request);
   if (!user) {
@@ -16,7 +16,10 @@ export async function GET(
     const { connection, server } = body;
 
     if (!connection || !server) {
-      return NextResponse.json({ error: "Connection and server details required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Connection and server details required" },
+        { status: 400 },
+      );
     }
 
     const { service, cleanup } = await getService(connection, server);
@@ -29,6 +32,9 @@ export async function GET(
     }
   } catch (error) {
     console.error("Backups error:", error);
-    return NextResponse.json({ error: "Failed to fetch backups" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch backups" },
+      { status: 500 },
+    );
   }
 }

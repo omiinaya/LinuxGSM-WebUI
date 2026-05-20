@@ -16,11 +16,36 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowLeft, Play, Square, RotateCcw, Terminal, Activity, Users, Cpu, HardDrive, Database, Download, Search, Archive, RotateCcw as Restart, RefreshCw, CheckCircle, FileText, Filter, Settings, ListFilter } from "lucide-react";
+import {
+  ArrowLeft,
+  Play,
+  Square,
+  RotateCcw,
+  Terminal,
+  Activity,
+  Users,
+  Cpu,
+  HardDrive,
+  Database,
+  Download,
+  Search,
+  Archive,
+  RotateCcw as Restart,
+  RefreshCw,
+  CheckCircle,
+  FileText,
+  Filter,
+  Settings,
+  ListFilter,
+} from "lucide-react";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
-  loading: () => <div className="text-center py-8 text-muted-foreground">Loading editor...</div>,
+  loading: () => (
+    <div className="text-center py-8 text-muted-foreground">
+      Loading editor...
+    </div>
+  ),
 });
 import { cn } from "@/lib/utils";
 
@@ -30,7 +55,7 @@ export default function ServerDetailPage() {
   const { servers, getServer, selectServer, updateServer } = useServersStore();
   const { viewMode } = useUIStore();
   const { user, loading: authLoading } = useAuth();
-  
+
   const serverId = params?.id as string | undefined;
   const server = serverId ? getServer(serverId) : undefined;
 
@@ -59,20 +84,30 @@ export default function ServerDetailPage() {
     gamemode: string;
   } | null>(null);
   const [queryLoading, setQueryLoading] = useState(false);
-  const [updateStatus, setUpdateStatus] = useState<"idle" | "checking" | "available" | "updating" | "complete">("idle");
-  const [updateInfo, setUpdateInfo] = useState<{ current: string; latest: string; output: string } | null>(null);
+  const [updateStatus, setUpdateStatus] = useState<
+    "idle" | "checking" | "available" | "updating" | "complete"
+  >("idle");
+  const [updateInfo, setUpdateInfo] = useState<{
+    current: string;
+    latest: string;
+    output: string;
+  } | null>(null);
   const [updateProgress, setUpdateProgress] = useState<string[]>([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showPortModal, setShowPortModal] = useState(false);
   const [portCheckLoading, setPortCheckLoading] = useState(false);
-  const [portConflicts, setPortConflicts] = useState<Array<{name: string; port: number}>>([]);
+  const [portConflicts, setPortConflicts] = useState<
+    Array<{ name: string; port: number }>
+  >([]);
   const [usedPortsList, setUsedPortsList] = useState<number[]>([]);
   const [consoleLog, setConsoleLog] = useState("");
   const [consoleCommand, setConsoleCommand] = useState("");
   const [showLogSettings, setShowLogSettings] = useState(false);
   const [consoleConnected, setConsoleConnected] = useState(false);
   const [consoleError, setConsoleError] = useState<string | null>(null);
-  const [selectedLogFile, setSelectedLogFile] = useState<"console" | "current" | "latest" | "debug">("console");
+  const [selectedLogFile, setSelectedLogFile] = useState<
+    "console" | "current" | "latest" | "debug"
+  >("console");
   const [logContent, setLogContent] = useState("");
   const [logsLoading, setLogsLoading] = useState(false);
   const [logError, setLogError] = useState<string | null>(null);
@@ -166,34 +201,34 @@ export default function ServerDetailPage() {
     }
   }, [autoRefreshLogs, server, fetchLogs]);
 
-   // Compute diff between current and original
+  // Compute diff between current and original
   const configDiff = useMemo(() => {
     if (!originalConfig) return [];
-    
-    const originalLines = originalConfig.split('\n');
-    const currentLines = configContent.split('\n');
-    
+
+    const originalLines = originalConfig.split("\n");
+    const currentLines = configContent.split("\n");
+
     // Simple line-by-line diff
-    const diff: { type: 'same' | 'added' | 'removed'; content: string }[] = [];
+    const diff: { type: "same" | "added" | "removed"; content: string }[] = [];
     const maxLines = Math.max(originalLines.length, currentLines.length);
-    
+
     for (let i = 0; i < maxLines; i++) {
-      const orig = originalLines[i] || '';
-      const curr = currentLines[i] || '';
-      
+      const orig = originalLines[i] || "";
+      const curr = currentLines[i] || "";
+
       if (orig === curr) {
-        diff.push({ type: 'same', content: orig });
+        diff.push({ type: "same", content: orig });
       } else if (curr && !orig) {
-        diff.push({ type: 'added', content: curr });
+        diff.push({ type: "added", content: curr });
       } else if (orig && !curr) {
-        diff.push({ type: 'removed', content: orig });
+        diff.push({ type: "removed", content: orig });
       } else {
         // Both different - show as removed then added
-        diff.push({ type: 'removed', content: orig });
-        diff.push({ type: 'added', content: curr });
+        diff.push({ type: "removed", content: orig });
+        diff.push({ type: "added", content: curr });
       }
     }
-    
+
     return diff;
   }, [originalConfig, configContent]);
 
@@ -201,12 +236,12 @@ export default function ServerDetailPage() {
 
   const handleSaveConfig = async () => {
     if (!server) return;
-    
+
     if (!hasChanges) {
       alert("No changes to save.");
       return;
     }
-    
+
     // Show diff modal for confirmation
     setShowConfigDiff(true);
   };
@@ -241,31 +276,34 @@ export default function ServerDetailPage() {
     }
   };
 
-  const triggerAlert = useCallback(async (event: string) => {
-    if (!server) return;
-    try {
-      await fetch("/api/alerts/trigger", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          event,
-          server: {
-            id: server.id,
-            name: server.name,
-            gameName: server.gameName,
-            ip: server.ip,
-            port: server.port,
-            status: server.status,
-            cpuUsage: server.cpuUsage,
-            memoryUsage: server.memoryUsage,
-            diskUsage: server.diskUsage,
-          },
-        }),
-      });
-    } catch (error) {
-      console.error("Alert trigger failed:", error);
-    }
-  }, [server]);
+  const triggerAlert = useCallback(
+    async (event: string) => {
+      if (!server) return;
+      try {
+        await fetch("/api/alerts/trigger", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event,
+            server: {
+              id: server.id,
+              name: server.name,
+              gameName: server.gameName,
+              ip: server.ip,
+              port: server.port,
+              status: server.status,
+              cpuUsage: server.cpuUsage,
+              memoryUsage: server.memoryUsage,
+              diskUsage: server.diskUsage,
+            },
+          }),
+        });
+      } catch (error) {
+        console.error("Alert trigger failed:", error);
+      }
+    },
+    [server],
+  );
 
   const fetchBackups = useCallback(async () => {
     if (!server) return;
@@ -292,7 +330,12 @@ export default function ServerDetailPage() {
   }, [server]);
 
   const handleRestore = async (backupFile: string) => {
-    if (!server || !confirm("Are you sure you want to restore this backup? Server will be stopped if running.")) {
+    if (
+      !server ||
+      !confirm(
+        "Are you sure you want to restore this backup? Server will be stopped if running.",
+      )
+    ) {
       return;
     }
 
@@ -354,34 +397,37 @@ export default function ServerDetailPage() {
     }
   }, [server]);
 
-  const sendCommand = useCallback(async (command: string) => {
-    if (!server || !command) return;
-    try {
-      const response = await fetch(`/api/servers/${server.id}/command`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: server.sshConnection,
-          server,
-          command,
-        }),
-      });
+  const sendCommand = useCallback(
+    async (command: string) => {
+      if (!server || !command) return;
+      try {
+        const response = await fetch(`/api/servers/${server.id}/command`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            connection: server.sshConnection,
+            server,
+            command,
+          }),
+        });
 
-      if (response.ok) {
-        // Clear command input (handled by parent)
-        // Refresh console after short delay
-        setTimeout(fetchConsoleLog, 500);
+        if (response.ok) {
+          // Clear command input (handled by parent)
+          // Refresh console after short delay
+          setTimeout(fetchConsoleLog, 500);
+        }
+      } catch (error) {
+        console.error("Command send error:", error);
       }
-    } catch (error) {
-      console.error("Command send error:", error);
-    }
-  }, [server, fetchConsoleLog]);
+    },
+    [server, fetchConsoleLog],
+  );
 
   useEffect(() => {
     if (server && server.status === "running") {
       // First, try SSE streaming
       const eventSource = new EventSource(
-        `/api/servers/${server.id}/console/stream?lines=100`
+        `/api/servers/${server.id}/console/stream?lines=100`,
       );
 
       eventSource.onopen = () => {
@@ -399,11 +445,11 @@ export default function ServerDetailPage() {
         if (data.full) {
           setConsoleLog(data.full);
         } else if (data.lines) {
-          setConsoleLog(prev => {
-            const combined = prev + '\n' + data.lines.join('\n');
+          setConsoleLog((prev) => {
+            const combined = prev + "\n" + data.lines.join("\n");
             // Keep only last 500 lines
-            const lines = combined.split('\n');
-            return lines.slice(-500).join('\n');
+            const lines = combined.split("\n");
+            return lines.slice(-500).join("\n");
           });
         }
       });
@@ -425,27 +471,30 @@ export default function ServerDetailPage() {
     }
   }, [server?.id, server?.status]);
 
-  const refreshStatus = useCallback(async (srv: typeof server) => {
-    if (!srv) return;
-    try {
-      const response = await fetch(`/api/servers/${srv.id}/status`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          connection: srv.sshConnection,
-        }),
-      });
+  const refreshStatus = useCallback(
+    async (srv: typeof server) => {
+      if (!srv) return;
+      try {
+        const response = await fetch(`/api/servers/${srv.id}/status`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            connection: srv.sshConnection,
+          }),
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status) {
-          updateServer(srv.id, { status: data.status });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status) {
+            updateServer(srv.id, { status: data.status });
+          }
         }
+      } catch (error) {
+        console.error("Status refresh error:", error);
       }
-    } catch (error) {
-      console.error("Status refresh error:", error);
-    }
-  }, [updateServer]);
+    },
+    [updateServer],
+  );
 
   const handleStart = useCallback(async () => {
     if (!server) return;
@@ -536,7 +585,9 @@ export default function ServerDetailPage() {
       if (response.ok) {
         const data = await response.json();
         // Parse output to determine if update available
-        const hasUpdate = data.output?.includes("Update available") || data.output?.includes("new version");
+        const hasUpdate =
+          data.output?.includes("Update available") ||
+          data.output?.includes("new version");
         if (hasUpdate) {
           setUpdateInfo({
             current: data.output.match(/Current:\s*(.+)/)?.[1] || "unknown",
@@ -677,7 +728,10 @@ export default function ServerDetailPage() {
         const data = await response.json();
         // The command will run and return output
         // For streaming we'd need a different approach
-        setUpdateProgress(prev => [...prev, data.output || "Update completed"]);
+        setUpdateProgress((prev) => [
+          ...prev,
+          data.output || "Update completed",
+        ]);
         setUpdateStatus("complete");
         triggerAlert("update");
         setTimeout(() => {
@@ -728,9 +782,10 @@ export default function ServerDetailPage() {
           <main className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <h1 className="text-2xl font-bold mb-2">Server Not Found</h1>
-                 <p className="text-muted-foreground mb-4">
-                 The server you are looking for does not exist or has been removed.
-               </p>
+              <p className="text-muted-foreground mb-4">
+                The server you are looking for does not exist or has been
+                removed.
+              </p>
               <Button onClick={() => router.push("/")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard
@@ -747,9 +802,16 @@ export default function ServerDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Server Not Found</h1>
-          <p className="text-gray-600 mb-4">The server you are looking for does not exist.</p>
-          <button onClick={() => router.push("/")} className="px-4 py-2 bg-indigo-600 text-white rounded">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Server Not Found
+          </h1>
+          <p className="text-gray-600 mb-4">
+            The server you are looking for does not exist.
+          </p>
+          <button
+            onClick={() => router.push("/")}
+            className="px-4 py-2 bg-indigo-600 text-white rounded"
+          >
             Go to Dashboard
           </button>
         </div>
@@ -761,10 +823,10 @@ export default function ServerDetailPage() {
     <>
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header />
-          
+
           <main className="flex-1 overflow-y-auto p-6">
             {/* Server Header */}
             <div className="flex items-start justify-between mb-6">
@@ -784,7 +846,7 @@ export default function ServerDetailPage() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2 flex-wrap">
                 {server.status === "running" ? (
                   <>
@@ -802,28 +864,51 @@ export default function ServerDetailPage() {
                     <Play className="w-4 h-4 mr-2" />
                     Start
                   </Button>
-               )}
-              <Button variant="secondary" onClick={handleBackup} disabled={server.status === "installing" || server.status === "updating"}>
-                <Download className="w-4 h-4 mr-2" />
-                Backup
-              </Button>
-              <Button variant="ghost" onClick={handleCheckUpdate} disabled={server.status === "installing"}>
-                <Search className="w-4 h-4 mr-2" />
-                Check Update
-              </Button>
-               <Button variant="ghost" onClick={handleValidate} disabled={server.status === "installing"}>
-                 <CheckCircle className="w-4 h-4 mr-2" />
-                 Validate
-               </Button>
-               <Button variant="ghost" onClick={handleCheckPorts} disabled={portCheckLoading || server.status === "installing"}>
-                 <ListFilter className="w-4 h-4 mr-2" />
-                 {portCheckLoading ? "Checking..." : "Check Ports"}
-               </Button>
-             </div>
+                )}
+                <Button
+                  variant="secondary"
+                  onClick={handleBackup}
+                  disabled={
+                    server.status === "installing" ||
+                    server.status === "updating"
+                  }
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Backup
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleCheckUpdate}
+                  disabled={server.status === "installing"}
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  Check Update
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleValidate}
+                  disabled={server.status === "installing"}
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Validate
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleCheckPorts}
+                  disabled={portCheckLoading || server.status === "installing"}
+                >
+                  <ListFilter className="w-4 h-4 mr-2" />
+                  {portCheckLoading ? "Checking..." : "Check Ports"}
+                </Button>
+              </div>
             </div>
 
             {/* Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="space-y-4"
+            >
               <TabsList>
                 <TabsTrigger value="overview">
                   <Activity className="w-4 h-4 mr-2" />
@@ -857,29 +942,39 @@ export default function ServerDetailPage() {
                   <div className="bg-card rounded-lg border p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Cpu className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">CPU Usage</span>
+                      <span className="text-sm text-muted-foreground">
+                        CPU Usage
+                      </span>
                     </div>
                     <div className="text-2xl font-bold">{server.cpuUsage}%</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {server.uptime > 0 ? `Uptime: ${Math.floor(server.uptime / 3600000)}h` : "Offline"}
+                      {server.uptime > 0
+                        ? `Uptime: ${Math.floor(server.uptime / 3600000)}h`
+                        : "Offline"}
                     </div>
                   </div>
-                  
+
                   <div className="bg-card rounded-lg border p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <HardDrive className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Memory</span>
+                      <span className="text-sm text-muted-foreground">
+                        Memory
+                      </span>
                     </div>
-                    <div className="text-2xl font-bold">{server.memoryUsage}%</div>
+                    <div className="text-2xl font-bold">
+                      {server.memoryUsage}%
+                    </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {server.maxPlayers} max players
                     </div>
                   </div>
-                  
+
                   <div className="bg-card rounded-lg border p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Users className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Players</span>
+                      <span className="text-sm text-muted-foreground">
+                        Players
+                      </span>
                     </div>
                     <div className="text-2xl font-bold">
                       {queryLoading ? (
@@ -892,9 +987,11 @@ export default function ServerDetailPage() {
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {queryLoading ? (
-                        <span className="text-muted-foreground">Querying...</span>
+                        <span className="text-muted-foreground">
+                          Querying...
+                        </span>
                       ) : queryData?.map ? (
-                        `${queryData.map}${queryData.gamemode ? ` • ${queryData.gamemode}` : ''}`
+                        `${queryData.map}${queryData.gamemode ? ` • ${queryData.gamemode}` : ""}`
                       ) : server.map ? (
                         server.map
                       ) : (
@@ -902,13 +999,17 @@ export default function ServerDetailPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="bg-card rounded-lg border p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Database className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Disk</span>
+                      <span className="text-sm text-muted-foreground">
+                        Disk
+                      </span>
                     </div>
-                    <div className="text-2xl font-bold">{server.diskUsage}%</div>
+                    <div className="text-2xl font-bold">
+                      {server.diskUsage}%
+                    </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {server.lgsmVersion || "Unknown version"}
                     </div>
@@ -917,22 +1018,38 @@ export default function ServerDetailPage() {
 
                 {/* Server Info */}
                 <div className="bg-card rounded-lg border p-6">
-                  <h2 className="text-lg font-semibold mb-4">Server Information</h2>
+                  <h2 className="text-lg font-semibold mb-4">
+                    Server Information
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <div className="text-sm text-muted-foreground">Install Path</div>
-                      <div className="font-mono text-sm">{server.installPath}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Install Path
+                      </div>
+                      <div className="font-mono text-sm">
+                        {server.installPath}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Config Path</div>
-                      <div className="font-mono text-sm">{server.configPath}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Config Path
+                      </div>
+                      <div className="font-mono text-sm">
+                        {server.configPath}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Created</div>
-                      <div>{new Date(server.createdAt).toLocaleDateString()}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Created
+                      </div>
+                      <div>
+                        {new Date(server.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Last Update</div>
+                      <div className="text-sm text-muted-foreground">
+                        Last Update
+                      </div>
                       <div>{server.lastUpdate || "Never"}</div>
                     </div>
                   </div>
@@ -944,17 +1061,34 @@ export default function ServerDetailPage() {
                   <div className="p-4 border-b flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <h2 className="text-lg font-semibold">Console</h2>
-                      <div className={`flex items-center gap-1 text-xs ${consoleConnected ? 'text-green-500' : consoleError ? 'text-red-500' : 'text-muted-foreground'}`}>
-                        <div className={`w-2 h-2 rounded-full ${consoleConnected ? 'bg-green-500' : consoleError ? 'bg-red-500' : 'bg-yellow-500'}`} />
-                        {consoleConnected ? 'Live' : consoleError ? 'Error' : 'Polling...'}
+                      <div
+                        className={`flex items-center gap-1 text-xs ${consoleConnected ? "text-green-500" : consoleError ? "text-red-500" : "text-muted-foreground"}`}
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full ${consoleConnected ? "bg-green-500" : consoleError ? "bg-red-500" : "bg-yellow-500"}`}
+                        />
+                        {consoleConnected
+                          ? "Live"
+                          : consoleError
+                            ? "Error"
+                            : "Polling..."}
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => document.getElementById('console-input')?.focus()}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        document.getElementById("console-input")?.focus()
+                      }
+                    >
                       <Terminal className="w-4 h-4 mr-2" />
                       Focus Input
                     </Button>
                   </div>
-                  <div className="bg-black text-green-400 font-mono p-4 h-[400px] overflow-y-auto" id="console-output">
+                  <div
+                    className="bg-black text-green-400 font-mono p-4 h-[400px] overflow-y-auto"
+                    id="console-output"
+                  >
                     <pre className="text-sm whitespace-pre-wrap">
                       {consoleLog || "Loading console..."}
                     </pre>
@@ -969,14 +1103,25 @@ export default function ServerDetailPage() {
                       onChange={(e) => setConsoleCommand(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && consoleCommand.trim()) {
-                          sendCommand(consoleCommand.trim()).then(() => setConsoleCommand(""));
+                          sendCommand(consoleCommand.trim()).then(() =>
+                            setConsoleCommand(""),
+                          );
                         }
                       }}
                     />
-                    <Button onClick={() => sendCommand(consoleCommand.trim()).then(() => setConsoleCommand(""))}>
+                    <Button
+                      onClick={() =>
+                        sendCommand(consoleCommand.trim()).then(() =>
+                          setConsoleCommand(""),
+                        )
+                      }
+                    >
                       Send
                     </Button>
-                    <Button variant="outline" onClick={() => setShowLogSettings(true)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowLogSettings(true)}
+                    >
                       Settings
                     </Button>
                   </div>
@@ -985,7 +1130,9 @@ export default function ServerDetailPage() {
 
               <TabsContent value="players">
                 <div className="bg-card rounded-lg border p-6">
-                  <h2 className="text-lg font-semibold mb-4">Current Players</h2>
+                  <h2 className="text-lg font-semibold mb-4">
+                    Current Players
+                  </h2>
                   {server.currentPlayers.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       No players currently online
@@ -1024,14 +1171,18 @@ export default function ServerDetailPage() {
                       <h2 className="text-lg font-semibold">Configuration</h2>
                       <div className="flex items-center gap-2">
                         <Button
-                          variant={configType === "lgsm" ? "secondary" : "ghost"}
+                          variant={
+                            configType === "lgsm" ? "secondary" : "ghost"
+                          }
                           size="sm"
                           onClick={() => setConfigType("lgsm")}
                         >
                           LGSM Config
                         </Button>
                         <Button
-                          variant={configType === "game" ? "secondary" : "ghost"}
+                          variant={
+                            configType === "game" ? "secondary" : "ghost"
+                          }
                           size="sm"
                           onClick={() => setConfigType("game")}
                         >
@@ -1045,56 +1196,75 @@ export default function ServerDetailPage() {
                           Saved successfully
                         </span>
                       )}
-                       <Button variant="outline" size="sm" onClick={loadConfig} disabled={configLoading}>
-                         {configLoading ? "Loading..." : "Reload"}
-                       </Button>
-                       <Button
-                         variant="outline"
-                         size="sm"
-                         onClick={() => router.push(`/server/${server.id}/parameters`)}
-                       >
-                         <Settings className="w-4 h-4 mr-2" />
-                         Visual Editor
-                       </Button>
-                       <Button size="sm" onClick={handleSaveConfig} disabled={configLoading}>
-                         Save Changes
-                       </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={loadConfig}
+                        disabled={configLoading}
+                      >
+                        {configLoading ? "Loading..." : "Reload"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          router.push(`/server/${server.id}/parameters`)
+                        }
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Visual Editor
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleSaveConfig}
+                        disabled={configLoading}
+                      >
+                        Save Changes
+                      </Button>
                     </div>
                   </div>
-                   <div className="p-4">
-                     {configLoading ? (
-                       <div className="text-center py-8 text-muted-foreground">
-                         Loading configuration...
-                       </div>
-                     ) : (
-                       <div className="border rounded-md">
-                         <MonacoEditor
-                           height="400px"
-                           language="ini"
-                           value={configContent}
-                           onChange={(value) => setConfigContent(value || '')}
-                           options={{
-                             minimap: { enabled: false },
-                             scrollBeyondLastLine: false,
-                             fontSize: 14,
-                             fontFamily: 'monospace',
-                           }}
-                         />
-                       </div>
-                     )}
-                   </div>
+                  <div className="p-4">
+                    {configLoading ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        Loading configuration...
+                      </div>
+                    ) : (
+                      <div className="border rounded-md">
+                        <MonacoEditor
+                          height="400px"
+                          language="ini"
+                          value={configContent}
+                          onChange={(value) => setConfigContent(value || "")}
+                          options={{
+                            minimap: { enabled: false },
+                            scrollBeyondLastLine: false,
+                            fontSize: 14,
+                            fontFamily: "monospace",
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
                   <div className="p-4 border-t text-sm text-muted-foreground">
                     {configType === "lgsm" ? (
                       <>
-                        Editing: <span className="font-mono">{server.name}.cfg</span>
+                        Editing:{" "}
+                        <span className="font-mono">{server.name}.cfg</span>
                         <br />
-                        Path: <span className="font-mono">{server.configPath}/{server.name}.cfg</span>
+                        Path:{" "}
+                        <span className="font-mono">
+                          {server.configPath}/{server.name}.cfg
+                        </span>
                       </>
                     ) : (
                       <>
                         Editing: <span className="font-mono">server.cfg</span>
                         <br />
-                        Path: <span className="font-mono">{server.installPath}/serverfiles/{server.name}/cfg/server.cfg</span>
+                        Path:{" "}
+                        <span className="font-mono">
+                          {server.installPath}/serverfiles/{server.name}
+                          /cfg/server.cfg
+                        </span>
                       </>
                     )}
                   </div>
@@ -1105,7 +1275,12 @@ export default function ServerDetailPage() {
                 <div className="bg-card rounded-lg border p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold">Backups</h2>
-                    <Button variant="outline" size="sm" onClick={handleBackup} disabled={server.status === "installing"}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBackup}
+                      disabled={server.status === "installing"}
+                    >
                       <Download className="w-4 h-4 mr-2" />
                       Create Backup
                     </Button>
@@ -1134,7 +1309,9 @@ export default function ServerDetailPage() {
                           {backups.map((backup, idx) => (
                             <tr key={idx} className="border-b">
                               <td className="p-2">{backup.date}</td>
-                              <td className="p-2 font-mono text-sm">{backup.file}</td>
+                              <td className="p-2 font-mono text-sm">
+                                {backup.file}
+                              </td>
                               <td className="p-2">{backup.size}</td>
                               <td className="p-2 text-right">
                                 <Button
@@ -1169,28 +1346,40 @@ export default function ServerDetailPage() {
                       <h2 className="text-lg font-semibold">Logs</h2>
                       <div className="flex items-center gap-2">
                         <Button
-                          variant={selectedLogFile === "console" ? "secondary" : "ghost"}
+                          variant={
+                            selectedLogFile === "console"
+                              ? "secondary"
+                              : "ghost"
+                          }
                           size="sm"
                           onClick={() => setSelectedLogFile("console")}
                         >
                           Console
                         </Button>
                         <Button
-                          variant={selectedLogFile === "current" ? "secondary" : "ghost"}
+                          variant={
+                            selectedLogFile === "current"
+                              ? "secondary"
+                              : "ghost"
+                          }
                           size="sm"
                           onClick={() => setSelectedLogFile("current")}
                         >
                           Current
                         </Button>
                         <Button
-                          variant={selectedLogFile === "latest" ? "secondary" : "ghost"}
+                          variant={
+                            selectedLogFile === "latest" ? "secondary" : "ghost"
+                          }
                           size="sm"
                           onClick={() => setSelectedLogFile("latest")}
                         >
                           Latest
                         </Button>
                         <Button
-                          variant={selectedLogFile === "debug" ? "secondary" : "ghost"}
+                          variant={
+                            selectedLogFile === "debug" ? "secondary" : "ghost"
+                          }
                           size="sm"
                           onClick={() => setSelectedLogFile("debug")}
                         >
@@ -1212,7 +1401,9 @@ export default function ServerDetailPage() {
                         size="sm"
                         onClick={() => setAutoRefreshLogs(!autoRefreshLogs)}
                       >
-                        {autoRefreshLogs ? "Auto-Refresh ON" : "Auto-Refresh OFF"}
+                        {autoRefreshLogs
+                          ? "Auto-Refresh ON"
+                          : "Auto-Refresh OFF"}
                       </Button>
                     </div>
                   </div>
@@ -1224,14 +1415,20 @@ export default function ServerDetailPage() {
                     ) : (
                       <div className="bg-black text-green-400 font-mono text-sm p-4 rounded-lg h-[500px] overflow-y-auto">
                         <pre className="whitespace-pre-wrap">
-                          {logContent || (logsLoading ? "Loading logs..." : "No log data")}
+                          {logContent ||
+                            (logsLoading ? "Loading logs..." : "No log data")}
                         </pre>
                       </div>
                     )}
                   </div>
                   <div className="p-4 border-t text-sm text-muted-foreground">
-                    Viewing: <span className="font-mono">{selectedLogFile}.log</span>
-                    {autoRefreshLogs && <span className="ml-2 text-green-500">• Auto-refresh every 5s</span>}
+                    Viewing:{" "}
+                    <span className="font-mono">{selectedLogFile}.log</span>
+                    {autoRefreshLogs && (
+                      <span className="ml-2 text-green-500">
+                        • Auto-refresh every 5s
+                      </span>
+                    )}
                   </div>
                 </div>
               </TabsContent>
@@ -1252,8 +1449,10 @@ export default function ServerDetailPage() {
             </DialogTitle>
             <DialogDescription>
               {updateStatus === "checking" && "Connecting to server..."}
-              {updateStatus === "available" && "A new version of LinuxGSM is available."}
-              {updateStatus === "updating" && "Installing update, please wait..."}
+              {updateStatus === "available" &&
+                "A new version of LinuxGSM is available."}
+              {updateStatus === "updating" &&
+                "Installing update, please wait..."}
               {updateStatus === "complete" && "Update finished successfully."}
             </DialogDescription>
           </DialogHeader>
@@ -1263,16 +1462,24 @@ export default function ServerDetailPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-muted p-3 rounded">
-                    <div className="text-sm text-muted-foreground">Current Version</div>
-                    <div className="text-lg font-mono">{updateInfo.current}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Current Version
+                    </div>
+                    <div className="text-lg font-mono">
+                      {updateInfo.current}
+                    </div>
                   </div>
                   <div className="bg-green-500/10 p-3 rounded border border-green-500">
                     <div className="text-sm text-green-600">New Version</div>
-                    <div className="text-lg font-mono text-green-600">{updateInfo.latest}</div>
+                    <div className="text-lg font-mono text-green-600">
+                      {updateInfo.latest}
+                    </div>
                   </div>
                 </div>
                 <div className="bg-muted rounded p-3 text-sm">
-                  <pre className="whitespace-pre-wrap font-mono">{updateInfo.output}</pre>
+                  <pre className="whitespace-pre-wrap font-mono">
+                    {updateInfo.output}
+                  </pre>
                 </div>
               </div>
             )}
@@ -1281,12 +1488,18 @@ export default function ServerDetailPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <RefreshCw className="w-5 h-5 animate-spin text-primary" />
-                  <span>{updateStatus === "checking" ? "Checking server for updates..." : "Updating LinuxGSM..."}</span>
+                  <span>
+                    {updateStatus === "checking"
+                      ? "Checking server for updates..."
+                      : "Updating LinuxGSM..."}
+                  </span>
                 </div>
                 {updateProgress.length > 0 && (
                   <div className="bg-black text-green-400 font-mono p-3 rounded text-sm h-48 overflow-y-auto">
                     {updateProgress.map((line, i) => (
-                      <div key={i} className="mb-1">{line}</div>
+                      <div key={i} className="mb-1">
+                        {line}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -1306,7 +1519,10 @@ export default function ServerDetailPage() {
           <DialogFooter>
             {updateStatus === "available" && (
               <>
-                <Button variant="outline" onClick={() => setShowUpdateModal(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowUpdateModal(false)}
+                >
                   Cancel
                 </Button>
                 <Button onClick={handlePerformUpdate}>
@@ -1315,12 +1531,14 @@ export default function ServerDetailPage() {
                 </Button>
               </>
             )}
-            {(updateStatus === "complete" || updateStatus === "checking" || updateStatus === "updating") && (
+            {(updateStatus === "complete" ||
+              updateStatus === "checking" ||
+              updateStatus === "updating") && (
               <Button onClick={() => setShowUpdateModal(false)}>Close</Button>
             )}
-           </DialogFooter>
-         </DialogContent>
-       </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Config Diff Confirmation Modal */}
       <Dialog open={showConfigDiff} onOpenChange={setShowConfigDiff}>
@@ -1328,32 +1546,46 @@ export default function ServerDetailPage() {
           <DialogHeader>
             <DialogTitle>Confirm Configuration Changes</DialogTitle>
             <DialogDescription>
-              Review the changes below before saving. This will modify {configType === "lgsm" ? server.name : "server.cfg"} on the remote server.
+              Review the changes below before saving. This will modify{" "}
+              {configType === "lgsm" ? server.name : "server.cfg"} on the remote
+              server.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="flex-1 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">
-                {configDiff.filter(l => l.type !== 'same').length} lines changed
+                {configDiff.filter((l) => l.type !== "same").length} lines
+                changed
               </span>
-              <Button variant="outline" size="sm" onClick={() => setShowConfigDiff(false)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowConfigDiff(false)}
+              >
                 Cancel
               </Button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto bg-muted rounded p-3 font-mono text-sm">
               {configDiff.map((line, idx) => (
-                <div key={idx} className={cn(
-                  "whitespace-pre-wrap",
-                  line.type === 'added' && "bg-green-500/20 text-green-400",
-                  line.type === 'removed' && "bg-red-500/20 text-red-400",
-                  line.type === 'same' && "text-muted-foreground"
-                )}>
+                <div
+                  key={idx}
+                  className={cn(
+                    "whitespace-pre-wrap",
+                    line.type === "added" && "bg-green-500/20 text-green-400",
+                    line.type === "removed" && "bg-red-500/20 text-red-400",
+                    line.type === "same" && "text-muted-foreground",
+                  )}
+                >
                   <span className="inline-block w-8 text-xs text-muted-foreground/50">
-                    {line.type === 'added' ? '+' : line.type === 'removed' ? '-' : ''}
+                    {line.type === "added"
+                      ? "+"
+                      : line.type === "removed"
+                        ? "-"
+                        : ""}
                   </span>
-                  {line.content || '(empty line)'}
+                  {line.content || "(empty line)"}
                 </div>
               ))}
             </div>
@@ -1363,9 +1595,7 @@ export default function ServerDetailPage() {
             <Button variant="outline" onClick={() => setShowConfigDiff(false)}>
               Cancel
             </Button>
-            <Button onClick={confirmSaveConfig}>
-              Save Changes
-            </Button>
+            <Button onClick={confirmSaveConfig}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1390,19 +1620,27 @@ export default function ServerDetailPage() {
                   <div>
                     <p className="text-destructive mb-2">Conflicts found on:</p>
                     <ul className="list-disc pl-5">
-                      {portConflicts.map(c => (
-                        <li key={c.name}>{c.name} port {c.port}</li>
+                      {portConflicts.map((c) => (
+                        <li key={c.name}>
+                          {c.name} port {c.port}
+                        </li>
                       ))}
                     </ul>
                   </div>
                 )}
                 {usedPortsList.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-sm text-muted-foreground">All listening ports:</p>
+                    <p className="text-sm text-muted-foreground">
+                      All listening ports:
+                    </p>
                     <div className="text-xs font-mono mt-1 max-h-40 overflow-y-auto">
-                      {usedPortsList.sort((a,b) => a - b).map(p => (
-                        <span key={p} className="inline-block mr-2">{p}</span>
-                      ))}
+                      {usedPortsList
+                        .sort((a, b) => a - b)
+                        .map((p) => (
+                          <span key={p} className="inline-block mr-2">
+                            {p}
+                          </span>
+                        ))}
                     </div>
                   </div>
                 )}

@@ -4,7 +4,7 @@ import { logAdminEvent } from "@/lib/audit";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const user = await getUserFromRequest(request);
 
@@ -23,17 +23,20 @@ export async function DELETE(
   }
 
   if (userId === user.id) {
-    return NextResponse.json({ error: "Cannot delete yourself" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Cannot delete yourself" },
+      { status: 400 },
+    );
   }
 
   const success = await deleteUser(userId);
   if (!success) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
-  
+
   // Log user deletion
   await logAdminEvent("user_delete", user.id, user.username, userId, {
-    deletedUserId: userId
+    deletedUserId: userId,
   });
 
   return NextResponse.json({ success: true });
@@ -41,22 +44,19 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   return await handleUpdate(request, params.id);
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   return await handleUpdate(request, params.id);
 }
 
-async function handleUpdate(
-  request: NextRequest,
-  userId: string
-) {
+async function handleUpdate(request: NextRequest, userId: string) {
   const user = await getUserFromRequest(request);
 
   if (!user) {

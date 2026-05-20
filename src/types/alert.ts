@@ -12,7 +12,7 @@ export interface AlertChannel {
   config: Record<string, string>;
 }
 
-export type AlertChannelType = 
+export type AlertChannelType =
   | "discord"
   | "email"
   | "telegram"
@@ -27,7 +27,7 @@ export interface AlertEvent {
   enabled: boolean;
 }
 
-export type AlertEventType = 
+export type AlertEventType =
   | "server_started"
   | "server_stopped"
   | "server_crashed"

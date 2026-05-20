@@ -12,7 +12,16 @@ async function readConfig(): Promise<any> {
     return {
       enabled: false,
       discord: { enabled: false, webhookUrl: "" },
-      email: { enabled: false, host: "", port: 587, secure: false, user: "", pass: "", from: "", to: "" },
+      email: {
+        enabled: false,
+        host: "",
+        port: 587,
+        secure: false,
+        user: "",
+        pass: "",
+        from: "",
+        to: "",
+      },
       events: {
         serverStart: true,
         serverStop: true,
@@ -48,7 +57,7 @@ export async function GET() {
     console.error("Config read error:", error);
     return NextResponse.json(
       { error: "Failed to read alert config" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -63,7 +72,7 @@ export async function POST(request: NextRequest) {
     console.error("Config write error:", error);
     return NextResponse.json(
       { error: "Failed to save alert config" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

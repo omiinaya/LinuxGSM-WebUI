@@ -5,17 +5,17 @@ import { logAuthEvent } from "@/lib/audit";
 // DELETE /api/sessions/[token] - Revoke a session
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: { token: string } },
 ) {
   const user = await getUserFromRequest(request);
-  
+
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const token = params.token;
   const sessions = await (await import("@/lib/auth")).getAllSessions();
-  const session = sessions.find(s => s.token === token);
+  const session = sessions.find((s) => s.token === token);
 
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
@@ -27,7 +27,7 @@ export async function DELETE(
   }
 
   await deleteSession(token);
-  
+
   // Log session revocation
   await logAuthEvent("session_revoke", user.id, user.username, {
     revokedUserId: session.userId,

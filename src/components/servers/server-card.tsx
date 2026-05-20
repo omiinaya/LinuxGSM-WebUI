@@ -1,24 +1,29 @@
 "use client";
 
 import * as React from "react";
-import { 
-  Server, 
-  Play, 
-  Square, 
-  RotateCcw, 
+import {
+  Server,
+  Play,
+  Square,
+  RotateCcw,
   MoreVertical,
   Terminal,
   Settings,
   Trash2,
   Cpu,
   HardDrive,
-  Users
+  Users,
 } from "lucide-react";
 import type { Server as ServerType, ServerStatus } from "@/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,10 +80,12 @@ export function ServerCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className={cn(
-              "w-10 h-10 rounded-lg flex items-center justify-center",
-              statusColors[server.status]
-            )}>
+            <div
+              className={cn(
+                "w-10 h-10 rounded-lg flex items-center justify-center",
+                statusColors[server.status],
+              )}
+            >
               <Server className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -102,21 +109,21 @@ export function ServerCard({
                 Console
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onStart?.(server)}
                 disabled={isRunning}
               >
                 <Play className="mr-2 w-4 h-4" />
                 Start
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onStop?.(server)}
                 disabled={!isRunning}
               >
                 <Square className="mr-2 w-4 h-4" />
                 Stop
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onRestart?.(server)}
                 disabled={!isRunning}
               >
@@ -124,7 +131,7 @@ export function ServerCard({
                 Restart
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onDelete?.(server)}
                 className="text-destructive"
               >
@@ -135,27 +142,25 @@ export function ServerCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      
+
       <CardContent className="pb-3">
         <div className="flex items-center gap-4 text-sm">
-          <Badge 
+          <Badge
             variant={isRunning ? "default" : "secondary"}
-            className={cn(
-              isRunning && "bg-green-500 hover:bg-green-600"
-            )}
+            className={cn(isRunning && "bg-green-500 hover:bg-green-600")}
           >
             {statusLabels[server.status]}
           </Badge>
-          
+
           <div className="flex items-center gap-1 text-muted-foreground">
             <Users className="w-4 h-4" />
-            <span>{server.currentPlayers.length}/{server.maxPlayers}</span>
+            <span>
+              {server.currentPlayers.length}/{server.maxPlayers}
+            </span>
           </div>
 
           {server.map && (
-            <span className="text-muted-foreground truncate">
-              {server.map}
-            </span>
+            <span className="text-muted-foreground truncate">{server.map}</span>
           )}
         </div>
 
@@ -176,18 +181,18 @@ export function ServerCard({
       <CardFooter className="pt-0 gap-2">
         {isRunning ? (
           <>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="flex-1"
               onClick={() => onStop?.(server)}
             >
               <Square className="w-3 h-3 mr-1" />
               Stop
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="flex-1"
               onClick={() => onRestart?.(server)}
             >
@@ -196,9 +201,9 @@ export function ServerCard({
             </Button>
           </>
         ) : (
-          <Button 
-            variant="default" 
-            size="sm" 
+          <Button
+            variant="default"
+            size="sm"
             className="flex-1"
             onClick={() => onStart?.(server)}
           >

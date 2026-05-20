@@ -28,10 +28,14 @@ export default function AdminUsersPage() {
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newEmail, setNewEmail] = useState("");
-  const [newRole, setNewRole] = useState<"viewer" | "operator" | "admin">("viewer");
+  const [newRole, setNewRole] = useState<"viewer" | "operator" | "admin">(
+    "viewer",
+  );
   const [createError, setCreateError] = useState<string | null>(null);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
-  const [editingRole, setEditingRole] = useState<"viewer" | "operator" | "admin">("viewer");
+  const [editingRole, setEditingRole] = useState<
+    "viewer" | "operator" | "admin"
+  >("viewer");
 
   useEffect(() => {
     fetchUsers();
@@ -64,7 +68,7 @@ export default function AdminUsersPage() {
       if (!res.ok) {
         throw new Error("Failed to delete user");
       }
-      setUsers(users.filter(u => u.id !== userId));
+      setUsers(users.filter((u) => u.id !== userId));
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     }
@@ -75,7 +79,10 @@ export default function AdminUsersPage() {
     setEditingRole(currentRole as "admin" | "operator" | "viewer");
   };
 
-  const saveRole = async (userId: string, newRoleValue: "admin" | "operator" | "viewer") => {
+  const saveRole = async (
+    userId: string,
+    newRoleValue: "admin" | "operator" | "viewer",
+  ) => {
     try {
       const res = await fetch(`/api/users/${userId}`, {
         method: "PATCH",
@@ -88,7 +95,9 @@ export default function AdminUsersPage() {
         throw new Error(data.error || "Failed to update role");
       }
 
-      setUsers(users.map(u => u.id === userId ? { ...u, role: newRoleValue } : u));
+      setUsers(
+        users.map((u) => (u.id === userId ? { ...u, role: newRoleValue } : u)),
+      );
       setEditingUserId(null);
     } catch (err: any) {
       alert(`Error: ${err.message}`);
@@ -152,7 +161,9 @@ export default function AdminUsersPage() {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                User Management
+              </h1>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
@@ -165,25 +176,43 @@ export default function AdminUsersPage() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Username
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Role
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Last Login
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {users.map(user => (
+                  {users.map((user) => (
                     <tr key={user.id}>
-                      <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{user.username}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">{user.email || "-"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                        {user.username}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                        {user.email || "-"}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {editingUserId === user.id ? (
                           <div className="flex items-center gap-2">
                             <select
                               value={editingRole}
-                              onChange={(e) => setEditingRole(e.target.value as any)}
+                              onChange={(e) =>
+                                setEditingRole(e.target.value as any)
+                              }
                               className="border rounded px-2 py-1 text-sm"
                             >
                               <option value="admin">Admin</option>
@@ -205,7 +234,9 @@ export default function AdminUsersPage() {
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleColors[user.role]}`}>
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleColors[user.role]}`}
+                            >
                               {user.role}
                             </span>
                             <button
@@ -221,7 +252,9 @@ export default function AdminUsersPage() {
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">
-                        {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}
+                        {user.lastLogin
+                          ? new Date(user.lastLogin).toLocaleDateString()
+                          : "Never"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                         <button
@@ -236,7 +269,10 @@ export default function AdminUsersPage() {
                   ))}
                   {users.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                      <td
+                        colSpan={6}
+                        className="px-6 py-4 text-center text-gray-500"
+                      >
                         No users found
                       </td>
                     </tr>

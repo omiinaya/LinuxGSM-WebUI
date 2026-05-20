@@ -5,14 +5,17 @@ import { logServerEvent } from "@/lib/audit";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const user = await getUserFromRequest(request);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (user.role === "viewer") {
-    return NextResponse.json({ error: "Forbidden: insufficient permissions" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Forbidden: insufficient permissions" },
+      { status: 403 },
+    );
   }
 
   try {
@@ -20,7 +23,10 @@ export async function POST(
     const { connection, server, cronLine } = body;
 
     if (!connection || !server || !cronLine) {
-      return NextResponse.json({ error: "Connection, server, and cronLine are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Connection, server, and cronLine are required" },
+        { status: 400 },
+      );
     }
 
     const { service, cleanup } = await getService(connection, server);
@@ -29,7 +35,10 @@ export async function POST(
       // Use generic execute to run cron commands
       const listResult = await service.execute("crontab -l");
       if (listResult.success && listResult.output.includes(cronLine)) {
-        return NextResponse.json({ success: true, message: "Cron job already exists" });
+        return NextResponse.json({
+          success: true,
+          message: "Cron job already exists",
+        });
       }
 
       const escapedLine = cronLine.replace(/'/g, `'\\''`);
@@ -37,16 +46,27 @@ export async function POST(
       const result = await service.execute(addCmd);
 
       if (result.success) {
-        await logServerEvent("cron_add", user.id, user.username, server.id, { cronLine });
-        return NextResponse.json({ success: true, message: "Cron job added successfully" });
+        await logServerEvent("cron_add", user.id, user.username, server.id, {
+          cronLine,
+        });
+        return NextResponse.json({
+          success: true,
+          message: "Cron job added successfully",
+        });
       } else {
-        return NextResponse.json({ error: "Failed to add cron job", details: result.output }, { status: 500 });
+        return NextResponse.json(
+          { error: "Failed to add cron job", details: result.output },
+          { status: 500 },
+        );
       }
     } finally {
       await cleanup();
     }
   } catch (error) {
     console.error("Cron add error:", error);
-    return NextResponse.json({ error: "Failed to add cron job" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to add cron job" },
+      { status: 500 },
+    );
   }
 }

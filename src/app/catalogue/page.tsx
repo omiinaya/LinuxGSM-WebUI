@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { Sidebar, Header } from "@/components/layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Download } from "lucide-react";
@@ -25,7 +32,11 @@ export default function CataloguePage() {
   const [loading, setLoading] = useState(true);
   const [installDir, setInstallDir] = useState("./games");
   const [installingId, setInstallingId] = useState<string | null>(null);
-  const [installStatus, setInstallStatus] = useState<{ game: string; success: boolean; message: string } | null>(null);
+  const [installStatus, setInstallStatus] = useState<{
+    game: string;
+    success: boolean;
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchGames();
@@ -49,7 +60,10 @@ export default function CataloguePage() {
   };
 
   const installGame = async (gameId: string, gameName: string) => {
-    if (!confirm(`Install ${gameName} to ${installDir}? This may take a while.`)) return;
+    if (
+      !confirm(`Install ${gameName} to ${installDir}? This may take a while.`)
+    )
+      return;
 
     setInstallingId(gameId);
     setInstallStatus(null);
@@ -66,9 +80,17 @@ export default function CataloguePage() {
         throw new Error(data.error || "Installation failed");
       }
 
-      setInstallStatus({ game: gameName, success: true, message: data.message });
+      setInstallStatus({
+        game: gameName,
+        success: true,
+        message: data.message,
+      });
     } catch (err: any) {
-      setInstallStatus({ game: gameName, success: false, message: err.message });
+      setInstallStatus({
+        game: gameName,
+        success: false,
+        message: err.message,
+      });
     } finally {
       setInstallingId(null);
     }
@@ -91,8 +113,12 @@ export default function CataloguePage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">Only administrators can access the game catalogue.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Access Denied
+          </h1>
+          <p className="text-gray-600 mb-4">
+            Only administrators can access the game catalogue.
+          </p>
           <Button onClick={() => router.push("/")}>Go to Dashboard</Button>
         </div>
       </div>
@@ -132,16 +158,17 @@ export default function CataloguePage() {
             </div>
 
             {installStatus && (
-              <div className={`p-4 rounded-md ${installStatus.success ? "bg-green-500/15 text-green-500" : "bg-destructive/15 text-destructive"}`}>
+              <div
+                className={`p-4 rounded-md ${installStatus.success ? "bg-green-500/15 text-green-500" : "bg-destructive/15 text-destructive"}`}
+              >
                 {installStatus.success
                   ? `Successfully installed ${installStatus.game}.`
-                  : `Failed to install ${installStatus.game}: ${installStatus.message}`
-                }
+                  : `Failed to install ${installStatus.game}: ${installStatus.message}`}
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {games.map(game => (
+              {games.map((game) => (
                 <Card key={game.id}>
                   <CardHeader>
                     <CardTitle>{game.name}</CardTitle>
@@ -149,8 +176,14 @@ export default function CataloguePage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-sm text-muted-foreground">
-                      <p><strong>Default Port:</strong> {game.defaultPort}</p>
-                      {game.steamAppId && <p><strong>Steam App ID:</strong> {game.steamAppId}</p>}
+                      <p>
+                        <strong>Default Port:</strong> {game.defaultPort}
+                      </p>
+                      {game.steamAppId && (
+                        <p>
+                          <strong>Steam App ID:</strong> {game.steamAppId}
+                        </p>
+                      )}
                     </div>
                   </CardContent>
                   <CardFooter>

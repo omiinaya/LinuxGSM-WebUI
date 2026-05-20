@@ -2,7 +2,7 @@ export interface LinuxGSMConfig {
   // Server Identity
   gamename?: string;
   servername?: string;
-  
+
   // Network Settings
   ip?: string;
   port?: number;
@@ -11,41 +11,41 @@ export interface LinuxGSMConfig {
   clientport?: number;
   sourcetvport?: number;
   displayip?: string;
-  
+
   // Game Settings
   defaultmap?: string;
   gamemode?: string;
   maxplayers?: number;
-  
+
   // Query Settings
   querydelay?: number;
-  
+
   // Update Settings
   updateonstart?: boolean;
   branch?: string;
   betapassword?: string;
-  
+
   // Backup Settings
   backupdir?: string;
   maxbackups?: number;
   maxbackupdays?: number;
   stoponbackup?: boolean;
-  
+
   // Log Settings
   logdays?: number;
   consolelogging?: boolean;
-  
+
   // Monitor Settings
   monitor?: boolean;
-  
+
   // Stop Mode
   stopmode?: number;
-  
+
   // Steam Settings
   steamuser?: string;
   steampass?: string;
   gslt?: string;
-  
+
   // Alert Settings
   alert?: boolean;
   discordalert?: boolean;

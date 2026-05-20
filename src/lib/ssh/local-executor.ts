@@ -17,7 +17,9 @@ export class LocalExecutor {
     this.workingDir = options.workingDir || process.cwd();
   }
 
-  async execute(command: string): Promise<{ success: boolean; output: string; error?: string }> {
+  async execute(
+    command: string,
+  ): Promise<{ success: boolean; output: string; error?: string }> {
     try {
       const { stdout, stderr } = await execAsync(command, {
         cwd: this.workingDir,
@@ -77,13 +79,15 @@ export class LocalExecutor {
 }
 
 // Utility to detect LinuxGSM installations on the local machine
-export async function discoverLocalLinuxGSM(basePaths: string[] = ["/home", "/opt"]): Promise<any[]> {
+export async function discoverLocalLinuxGSM(
+  basePaths: string[] = ["/home", "/opt"],
+): Promise<any[]> {
   const discovered: any[] = [];
-  
+
   for (const basePath of basePaths) {
     try {
       const entries = await fs.readdir(basePath, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (entry.isDirectory()) {
           const userName = entry.name;
@@ -92,26 +96,33 @@ export async function discoverLocalLinuxGSM(basePaths: string[] = ["/home", "/op
             path.join(basePath, userName, "*server"),
             path.join(basePath, userName, "linuxgsm.sh"),
           ];
-          
+
           // Check each pattern by trying to list files
           for (const pattern of possibleScripts) {
             try {
-              const files = await execAsync(`ls -1 ${pattern} 2>/dev/null`).then(r => r.stdout.trim().split('\n')).catch(() => []);
-              
+              const files = await execAsync(`ls -1 ${pattern} 2>/dev/null`)
+                .then((r) => r.stdout.trim().split("\n"))
+                .catch(() => []);
+
               for (const file of files) {
-                if (file && file.endsWith(".server.sh") || file.endsWith("server")) {
+                if (
+                  (file && file.endsWith(".server.sh")) ||
+                  file.endsWith("server")
+                ) {
                   const scriptName = path.basename(file);
-                  const gameName = scriptName.replace(/.server.sh$/, "").replace(/server$/, "");
-                  
-                   // Basic details
-                   discovered.push({
-                     path: file,
-                     name: scriptName,
-                     gameName: gameName,
-                     userId: userName,
-                     installPath: path.dirname(file),
-                     configPath: path.join(path.dirname(file), "config"),
-                   });
+                  const gameName = scriptName
+                    .replace(/.server.sh$/, "")
+                    .replace(/server$/, "");
+
+                  // Basic details
+                  discovered.push({
+                    path: file,
+                    name: scriptName,
+                    gameName: gameName,
+                    userId: userName,
+                    installPath: path.dirname(file),
+                    configPath: path.join(path.dirname(file), "config"),
+                  });
                 }
               }
             } catch {
