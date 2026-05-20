@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest } from "@/lib/auth";
 
-export function requireAuth(request: NextRequest) {
-  const user = getUserFromRequest(request);
+export async function requireAuth(request: NextRequest) {
+  const user = await getUserFromRequest(request);
   if (!user) {
     return { error: "Unauthorized", status: 401 } as const;
   }
