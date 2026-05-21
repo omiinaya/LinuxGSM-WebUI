@@ -9,6 +9,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 ## Phase 1: Foundation & Infrastructure
 
 ### 1.1 Project Setup
+
 - [ ] Initialize Next.js 14+ with TypeScript
 - [ ] Configure Tailwind CSS
 - [ ] Install and configure shadcn/ui
@@ -16,6 +17,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Configure ESLint and Prettier
 
 ### 1.2 Backend API Layer
+
 - [ ] Create API routes for LinuxGSM communication
 - [ ] Set up SSH connection manager (using ssh2 library)
 - [ ] Create command execution service
@@ -23,6 +25,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Set up WebSocket for real-time updates
 
 ### 1.3 Core UI Components (shadcn)
+
 - [ ] Layout components (Sidebar, Header, PageContainer)
 - [ ] Navigation with server selector
 - [ ] Server cards with status indicators
@@ -31,6 +34,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Loading states and skeletons
 
 ### 1.4 Server Discovery & Connection
+
 - [ ] Server scanner (detect servers in /home or configurable path)
 - [ ] SSH connection form/modal
 - [ ] Connection testing and validation
@@ -43,6 +47,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 ## Phase 2: Server Management Dashboard
 
 ### 2.1 Server List View
+
 - [ ] Grid/List view toggle
 - [ ] Server cards showing:
   - Server name and game type
@@ -55,6 +60,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Bulk actions
 
 ### 2.2 Server Detail View
+
 - [ ] Overview tab:
   - Real-time status
   - Player list (from query)
@@ -67,6 +73,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Activity feed showing recent events
 
 ### 2.3 Real-time Monitoring
+
 - [ ] WebSocket integration for live updates
 - [ ] Server status polling (configurable interval)
 - [ ] Player count tracking over time
@@ -79,7 +86,8 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 ## Phase 3: Configuration Management
 
 ### 3.1 LinuxGSM Config Editor
-- [ ] Read/parse _default.cfg, common.cfg, instance.cfg
+
+- [ ] Read/parse \_default.cfg, common.cfg, instance.cfg
 - [ ] Visual config editor with form fields:
   - Server name and description
   - IP and port configuration
@@ -91,18 +99,21 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Backup before save
 
 ### 3.2 Game Server Config Editor
+
 - [ ] Support for common game configs (server.cfg, etc.)
 - [ ] Syntax-highlighted code editor (Monaco)
 - [ ] Config presets per game type
 - [ ] Template library
 
 ### 3.3 Start Parameters
+
 - [ ] Launch options editor
 - [ ] Predefined templates per game
 - [ ] Advanced mode (raw parameters)
 - [ ] Parameter validation
 
 ### 3.4 IP & Port Management
+
 - [ ] Visual port allocator
 - [ ] Port conflict detection
 - [ ] IP binding configuration
@@ -115,6 +126,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 ## Phase 4: Commands & Operations
 
 ### 4.1 Command Center
+
 - [ ] Full command palette (Ctrl+K):
   - install, start, stop, restart
   - update, check-update, force-update
@@ -124,6 +136,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Command history log
 
 ### 4.2 Install Wizard
+
 - [ ] Game server selector (browse supported games)
 - [ ] Installation path selection
 - [ ] Dependency checker and installer
@@ -131,6 +144,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Progress tracking with logs
 
 ### 4.3 Update Management
+
 - [ ] Check for updates UI
 - [ ] Update preview (what will change)
 - [ ] One-click update
@@ -138,6 +152,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Validation after update
 
 ### 4.4 Backup System
+
 - [ ] Backup creation with name/description
 - [ ] Backup scheduler (cron-like UI)
 - [ ] Backup storage location config
@@ -145,6 +160,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Backup comparison (size, date)
 
 ### 4.5 Console Access
+
 - [ ] Real-time console output (WebSocket)
 - [ ] Command input field
 - [ ] ANSI color support
@@ -152,6 +168,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Download console logs
 
 ### 4.6 Debug Mode
+
 - [ ] Debug log viewer
 - [ ] Common debug actions
 - [ ] Error highlighting
@@ -163,6 +180,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 ## Phase 5: Alerts & Notifications
 
 ### 5.1 Alert Configuration UI
+
 - [ ] Enable/disable alerts per server
 - [ ] Alert event types selection:
   - Server started/stopped
@@ -173,6 +191,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
   - Player count threshold
 
 ### 5.2 Notification Channels
+
 - [ ] **Discord**: Webhook configuration
 - [ ] **Email**: SMTP settings with test
 - [ ] **Telegram**: Bot API setup
@@ -183,10 +202,12 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] **Rocket.Chat**: Webhook setup
 
 ### 5.3 Test Alerts
+
 - [ ] Send test message to each channel
 - [ ] Delivery status tracking
 
 ### 5.4 Notification History
+
 - [ ] Alert log with timestamps
 - [ ] Filter by type/server/channel
 
@@ -197,6 +218,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 ## Phase 6: Monitoring & Logs
 
 ### 6.1 Log Viewer
+
 - [ ] Multiple log file support (console, current, latest)
 - [ ] Real-time log streaming
 - [ ] Search and filter
@@ -205,6 +227,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Log rotation settings
 
 ### 6.2 Statistics & Metrics
+
 - [ ] Player count history (graphs)
 - [ ] Resource usage history
 - [ ] Uptime tracking
@@ -212,6 +235,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Export data (CSV/JSON)
 
 ### 6.3 Health Checks
+
 - [ ] Server health score
 - [ ] Issue detection (port conflicts, missing deps)
 - [ ] Recommendations panel
@@ -223,18 +247,21 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 ## Phase 7: Advanced Features
 
 ### 7.1 Mod Management
+
 - [ ] Workshop integration (Steam)
 - [ ] Mod list viewer
 - [ ] Install/update/remove mods
 - [ ] Mod presets
 
 ### 7.2 Steam Features
+
 - [ ] SteamCMD integration
 - [ ] Branch management (beta, experimental)
 - [ ] App ID configuration
 - [ ] Steam credentials management (secrets)
 
 ### 7.3 User Management
+
 - [ ] Multi-user support with roles:
   - Admin: Full access
   - Operator: Start/Stop/Config
@@ -243,12 +270,14 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Activity audit log
 
 ### 7.4 Automation
+
 - [ ] Scheduled tasks (cron-like UI)
 - [ ] Auto-restart on crash
 - [ ] Auto-update schedules
 - [ ] Auto-backup schedules
 
 ### 7.5 Server Templates
+
 - [ ] Create server templates
 - [ ] Quick deploy from template
 - [ ] Template marketplace (future)
@@ -260,6 +289,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 ## Phase 8: Polish & Production
 
 ### 8.1 UI/UX Refinement
+
 - [ ] Dark/Light mode toggle
 - [ ] Responsive design (mobile support)
 - [ ] Custom themes
@@ -267,12 +297,14 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Accessibility improvements
 
 ### 8.2 Performance
+
 - [ ] Optimize WebSocket connections
 - [ ] Caching strategies
 - [ ] Pagination for large lists
 - [ ] Lazy loading
 
 ### 8.3 Security
+
 - [ ] HTTPS enforcement
 - [ ] Rate limiting
 - [ ] Input sanitization
@@ -280,12 +312,14 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Audit logging
 
 ### 8.4 Deployment
+
 - [ ] Docker configuration
 - [ ] Production build optimization
 - [ ] Health checks
 - [ ] Error tracking (Sentry)
 
 ### 8.5 Documentation
+
 - [ ] User documentation
 - [ ] API documentation
 - [ ] In-app tooltips
@@ -294,23 +328,24 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 
 ## Technical Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js 14, React 18, TypeScript |
-| UI | Tailwind CSS, shadcn/ui, Lucide Icons |
-| State | Zustand, React Query |
-| Backend | Next.js API Routes |
-| SSH | ssh2, node-ssh |
-| Real-time | WebSocket (ws) |
-| Charts | Recharts |
-| Editor | Monaco Editor |
-| Forms | React Hook Form + Zod |
+| Layer     | Technology                            |
+| --------- | ------------------------------------- |
+| Frontend  | Next.js 14, React 18, TypeScript      |
+| UI        | Tailwind CSS, shadcn/ui, Lucide Icons |
+| State     | Zustand, React Query                  |
+| Backend   | Next.js API Routes                    |
+| SSH       | ssh2, node-ssh                        |
+| Real-time | WebSocket (ws)                        |
+| Charts    | Recharts                              |
+| Editor    | Monaco Editor                         |
+| Forms     | React Hook Form + Zod                 |
 
 ---
 
 ## Component Library (shadcn/ui)
 
 ### Layout
+
 - [ ] Sidebar
 - [ ] Header
 - [ ] PageContainer
@@ -319,6 +354,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] CommandPalette
 
 ### Forms
+
 - [ ] Input
 - [ ] Select
 - [ ] Switch
@@ -327,6 +363,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Form (with validation)
 
 ### Data Display
+
 - [ ] Table
 - [ ] Badge
 - [ ] Avatar
@@ -334,6 +371,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Skeleton
 
 ### Feedback
+
 - [ ] Toast
 - [ ] Dialog (Modal)
 - [ ] AlertDialog (Confirm)
@@ -341,6 +379,7 @@ A full-featured web interface for managing LinuxGSM game servers with a modern, 
 - [ ] Separator
 
 ### Navigation
+
 - [ ] Command (CommandK)
 - [ ] DropdownMenu
 - [ ] Sheet (Slide-over)
@@ -415,6 +454,7 @@ POST   /api/alerts/test      # Send test alert
 ## Next Steps
 
 **Recommended Phase 1 Focus:**
+
 1. Project setup with Next.js + shadcn/ui
 2. Basic SSH connection handling
 3. Server discovery (scan for LinuxGSM servers)

@@ -87,6 +87,7 @@ The application stores data (users, sessions, audit logs) in the `data/` directo
 ### Alert Webhooks
 
 To receive Discord notifications:
+
 1. Create a webhook in your Discord channel settings
 2. Go to `/alerts`
 3. Paste the webhook URL
