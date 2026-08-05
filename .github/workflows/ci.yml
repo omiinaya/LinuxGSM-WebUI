@@ -14,7 +14,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci 2>/dev/null || npm install
-      - run: npx eslint . 2>/dev/null || true
-      - run: npx tsc --noEmit 2>/dev/null || npx vue-tsc --noEmit 2>/dev/null || true
-      - run: npx vite build 2>/dev/null || npx next build 2>/dev/null || true
+      - run: npm ci || npm install
+      - name: Lint
+        run: npx eslint . || true
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci || npm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Build production bundle
+        run: npm run build
+      - name: Run E2E tests
+        run: npx playwright test
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

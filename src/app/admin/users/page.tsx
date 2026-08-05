@@ -3,6 +3,18 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar, Header } from "@/components/layout";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface User {
   id: string;
@@ -154,6 +166,7 @@ export default function AdminUsersPage() {
   }
 
   return (
+    <>
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -284,5 +297,88 @@ export default function AdminUsersPage() {
         </main>
       </div>
     </div>
+
+    {/* Create User Modal */}
+    <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Create New User</DialogTitle>
+          <DialogDescription>
+            Create a new user account with a role. Passwords are stored
+            encrypted (scrypt) in data/users.json.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={createUser} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="new-username">Username</Label>
+            <Input
+              id="new-username"
+              placeholder="Username"
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-password">Password</Label>
+            <Input
+              id="new-password"
+              type="password"
+              placeholder="Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-email">Email (optional)</Label>
+            <Input
+              id="new-email"
+              type="email"
+              placeholder="user@example.com"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Role</Label>
+            <Select
+              value={newRole}
+              onValueChange={(v) =>
+                setNewRole(v as "viewer" | "operator" | "admin")
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="viewer">Viewer</SelectItem>
+                <SelectItem value="operator">Operator</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {createError && (
+            <div className="p-3 bg-destructive/15 text-destructive rounded-md text-sm">
+              {createError}
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCreateModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!newUsername || !newPassword}>
+              Create User
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

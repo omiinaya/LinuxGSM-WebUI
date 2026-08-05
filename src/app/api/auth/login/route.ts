@@ -7,10 +7,7 @@ import {
   deleteSession,
 } from "@/lib/auth";
 import { logAuthEvent } from "@/lib/audit";
-
-// In-memory pending 2FA tokens (userId -> expires)
-// Note: In production with multiple instances, use Redis or DB
-const pending2FATokens = new Map<string, { userId: string; expires: number }>();
+import { createPendingToken } from "@/lib/pending-2fa";
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,11 +51,7 @@ export async function POST(request: NextRequest) {
     // Check 2FA
     if (user.totpEnabled && user.totpSecret) {
       // Create pending token instead of session
-      const pendingToken = crypto.randomUUID();
-      pending2FATokens.set(pendingToken, {
-        userId: user.id,
-        expires: Date.now() + 5 * 60 * 1000, // 5 minutes
-      });
+      const pendingToken = createPendingToken(user.id);
       await logAuthEvent(
         "login_2fa_required",
         user.id,

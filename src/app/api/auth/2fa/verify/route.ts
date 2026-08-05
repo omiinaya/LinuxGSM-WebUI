@@ -3,25 +3,7 @@ import { cookies } from "next/headers";
 import { getUserById, createSession } from "@/lib/auth";
 import { verifyTOTP } from "@/lib/auth";
 import { logAuthEvent } from "@/lib/audit";
-
-// Simple in-memory pending 2FA tokens store
-const pending2FATokens = new Map<string, { userId: string; expires: number }>();
-
-function createPendingToken(userId: string): string {
-  const token = crypto.randomUUID();
-  pending2FATokens.set(token, { userId, expires: Date.now() + 5 * 60 * 1000 });
-  return token;
-}
-
-function verifyPendingToken(token: string): { userId: string } | null {
-  const entry = pending2FATokens.get(token);
-  if (!entry || entry.expires < Date.now()) {
-    pending2FATokens.delete(token);
-    return null;
-  }
-  pending2FATokens.delete(token);
-  return { userId: entry.userId };
-}
+import { verifyPendingToken } from "@/lib/pending-2fa";
 
 export async function POST(request: NextRequest) {
   try {

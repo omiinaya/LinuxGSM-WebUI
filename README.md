@@ -54,6 +54,25 @@ npm start
 
 The server binds to `0.0.0.0:3331` by default. You can change the port via the `PORT` environment variable or by editing the `start` script. The host is always `0.0.0.0` to allow external access.
 
+### Testing (E2E)
+
+The project ships a full Playwright end-to-end suite covering every page,
+workflow, button, and modal — auth (incl. 2FA), dashboard, server detail
+(console/config/backups/logs), catalogue + install wizard, alerts, admin,
+monitor setup, and parameters.
+
+```bash
+npm run build      # production bundle (required — the suite boots `next start`)
+npm run test:e2e   # runs Playwright in headless chromium
+npm run test:e2e:headed  # watch it run in a real browser
+```
+
+The suite resets `data/*.json` before each run (default admin: `admin` /
+`admin123`). File-backed flows (auth, users, sessions, audit, alerts) hit the
+real API; SSH-backed server operations are served by deterministic fixtures
+in `e2e/helpers.ts`, so no live LinuxGSM host is needed. CI runs the suite in
+the `e2e` job.
+
 ## Usage
 
 1. **Add a Server**: Click "Add Server" in the sidebar or dashboard
@@ -162,14 +181,17 @@ All endpoints expect a JSON body with `connection` (SSH credentials) and `server
 
 ## Development Roadmap
 
+- [x] User authentication (login, sessions, 2FA, password change)
+- [x] Install wizard UI
+- [x] Game catalogue with one-click install
+- [x] Alert configuration (Discord webhook + SMTP email)
+- [x] Admin user management + audit log + session revocation
+- [x] End-to-end test coverage (Playwright)
 - [ ] WebSocket for real-time console streaming
-- [ ] Install wizard UI
 - [ ] Update management with progress UI
 - [ ] Advanced log viewer with filtering
 - [ ] Settings page (theme, polling interval)
-- [ ] User authentication
 - [ ] Persistent backend storage (database)
-- [ ] Multi-user support with roles
 
 ## License
 
