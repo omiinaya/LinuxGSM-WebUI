@@ -1,5 +1,7 @@
 # LinuxGSM Web UI
 
+[![CI](https://github.com/omiinaya/LinuxGSM-WebUI/actions/workflows/ci.yml/badge.svg)](https://github.com/omiinaya/LinuxGSM-WebUI/actions/workflows/ci.yml)
+
 A modern, responsive web interface for managing LinuxGSM game servers built with Next.js 14, React 18, TypeScript, and shadcn/ui.
 
 ## Features
